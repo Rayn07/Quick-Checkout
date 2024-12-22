@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Bill</title>
+  <link rel="stylesheet" href="/styles.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+
+  <h1>Invoice #<%= bill.billNumber %></h1>
+  <p><strong>Date:</strong> <%= bill.date %></p>
+  <p><strong>Customer:</strong> <%= bill.customerName %></p>
+
+  <h2>Items</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% bill.items.forEach(item => { %>
+        <tr>
+          <td><%= item.description %></td>
+          <td><%= item.quantity %></td>
+          <td>$<%= item.price %></td>
+          <td>$<%= item.quantity * item.price %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <h3>Total Amount: $<%= bill.total %></h3>
+
+  <!-- Form to send the bill to any email -->
+  <h2>Send Bill</h2>
+  <form id = 'emailbox' action="/send-bill" method="POST">
+    <input type="email" name="email" placeholder="Enter recipient email" required>
+    <input type="hidden" name="billData" value='<%= JSON.stringify(bill) %>'>
+    <button type="submit">Send Bill</button>
+  </form>
+
+</body>
+</html>

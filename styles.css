@@ -1,0 +1,82 @@
+/* public/styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: 20px;
+    padding: 30px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1 {
+    color: #007BFF;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  th {
+    background-color: #f8f9fa;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  h3 {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  #emailbox {
+    width : 300px;
+    padding:20px;
+    background-color: none;
+    border-radius:6.5px;
+    margin : 35px;
+    float : left;
+  }
+
+  #emailbox button{
+    background-color: white;
+    color : black;
+    padding : 10px 20px;
+    border:none;
+    border-radius : 5.6px;
+    font-size: 7.5px;
+    cursor:pointer;
+
+}
+#emailbox input{
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+#emailbox button:hover{
+    background-color:grey;
+}
