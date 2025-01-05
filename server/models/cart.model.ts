@@ -1,10 +1,12 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import Product from "./product.model";
-import { CatchAsyncError } from "../middleware/catchAsyncError";
 
 export interface ICart extends Document {
 	store: Types.ObjectId;
 	productList: Array<{ product: Types.ObjectId; quantity: number }>;
+	addToCart: (productName: string) => Promise<boolean>;
+	getItemTotal: (productName: string) => Promise<number>;
+	getCartTotal: () => Promise<number>;
 }
 
 const cartSchema: Schema<ICart> = new Schema(
