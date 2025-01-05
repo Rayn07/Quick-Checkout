@@ -43,7 +43,7 @@ const userSchema: Schema<IUser> = new Schema(
 		purchases: [{ type: Schema.Types.ObjectId, ref: "Purchase" }],
 		cart: {
 			store: { type: Schema.Types.ObjectId, ref: "Store" },
-			items: [{ type: Schema.Types.ObjectId, ref: "Item" }],
+			items: [{ type: Schema.Types.ObjectId, ref: "Product" }],
 		},
 	},
 	{ timestamps: true }
