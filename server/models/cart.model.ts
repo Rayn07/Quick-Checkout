@@ -5,6 +5,7 @@ export interface ICart extends Document {
 	store: Types.ObjectId;
 	productList: Array<{ product: Types.ObjectId; quantity: number }>;
 	addToCart: (productName: string) => Promise<boolean>;
+	reduceQuantity: (productName: string) => Promise<boolean>;
 	getItemTotal: (productName: string) => Promise<number>;
 	getCartTotal: () => Promise<number>;
 }
@@ -41,6 +42,26 @@ cartSchema.methods.addToCart = async function (
 		});
 
 		this.productList.push({ product: product._id, quantity: 1 });
+		return true;
+	} catch (error) {
+		return false;
+	}
+};
+
+cartSchema.methods.reduceQuantity = async function (
+	productName: string
+): Promise<boolean> {
+	try {
+		const product = await Product.findOne({
+			store: this.store,
+			name: productName,
+		});
+		if (!product) return false;
+
+		this.productList.updateOne(
+			{ product: product._id },
+			{ $inc: { quantity: -1 } }
+		);
 		return true;
 	} catch (error) {
 		return false;

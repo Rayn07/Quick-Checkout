@@ -10,10 +10,8 @@ export interface IUser extends Document {
 	email: string;
 	password: string;
 	purchases: Array<Types.ObjectId>;
-	cart: {
-		store: Types.ObjectId;
-		items: Array<Types.ObjectId>;
-	};
+	cart: Types.ObjectId;
+
 	comparePassword: (password: string) => Promise<boolean>;
 	SignAccessToken: () => string;
 	SignRefreshToken: () => string;
