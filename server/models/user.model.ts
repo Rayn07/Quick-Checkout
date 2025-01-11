@@ -37,6 +37,7 @@ const userSchema: Schema<IUser> = new Schema(
 			type: String,
 			minlength: 6,
 			select: false,
+			required: true,
 		},
 		purchases: [{ type: Schema.Types.ObjectId, ref: "Purchase" }],
 		cart: { type: Schema.Types.ObjectId, ref: "Cart" },

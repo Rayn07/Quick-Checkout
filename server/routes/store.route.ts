@@ -1,14 +1,34 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import {
-	getStore,
+	getStoreDetails,
 	addProduct,
 	removeProduct,
-	getCart,
+	getCartDetails,
+	addStore,
+	getStoreAndUser,
 } from "../controllers/store.controller";
-import { isAutheticated } from "../middleware/auth";
+import { isAuthenticated } from "../middleware/auth";
 const storeRouter = express.Router();
 
-storeRouter.get("/:storeName", isAutheticated, getStore);
+storeRouter.get("/store", isAuthenticated, (req: Request, res: Response) => {
+	res.send("In Store Router");
+});
+
+storeRouter.post("/store/add-store", isAuthenticated, addStore);
+/* Request Body: JSON 
+{
+"name": string,
+"address": string,
+"location": string,
+"image": string
+} */
+
+storeRouter.get(
+	"/store/:storeName",
+	isAuthenticated,
+	getStoreAndUser,
+	getStoreDetails
+);
 /* Response Body: JSON 
 {
 "name": string,
@@ -17,13 +37,28 @@ storeRouter.get("/:storeName", isAutheticated, getStore);
 "location": string,
 } */
 
-storeRouter.post("/:storeName/addProduct", isAutheticated, addProduct);
+storeRouter.post(
+	"/store/:storeName/add-product",
+	isAuthenticated,
+	getStoreAndUser,
+	addProduct
+);
 /* Request Body: JSON { "productName": string } */
 
-storeRouter.post("/:storeName/removeProduct", isAutheticated, removeProduct);
+storeRouter.post(
+	"/store/:storeName/remove-product",
+	isAuthenticated,
+	getStoreAndUser,
+	removeProduct
+);
 /* Request Body: JSON { "productName": string } */
 
-storeRouter.get("/:storeName/Cart", isAutheticated, getCart);
+storeRouter.get(
+	"/store/:storeName/cart",
+	isAuthenticated,
+	getStoreAndUser,
+	getCartDetails
+);
 /* Response Body: JSON 
 {
 "productList": 

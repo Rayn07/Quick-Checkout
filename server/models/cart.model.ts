@@ -2,6 +2,7 @@ import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import Product from "./product.model";
 
 export interface ICart extends Document {
+	user: Types.ObjectId;
 	store: Types.ObjectId;
 	productList: Array<{ product: Types.ObjectId; quantity: number }>;
 	addToCart: (productName: string) => Promise<boolean>;
@@ -12,6 +13,7 @@ export interface ICart extends Document {
 
 const cartSchema: Schema<ICart> = new Schema(
 	{
+		user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 		store: { type: Schema.Types.ObjectId, ref: "Store", required: true },
 		productList: [
 			{
@@ -77,13 +79,13 @@ cartSchema.methods.getItemTotal = async function (
 			name: productName,
 		});
 		if (!product) return -1;
-		return (
-			product.discountPrice *
-			this.productList.find(
-				(item: { product: Types.ObjectId; quantity: number }) =>
-					item.product === product._id
-			).quantity
-		);
+
+		const itemQuantity = this.productList.find(
+			(item: { product: Types.ObjectId; quantity: number }) =>
+				item.product === product._id
+		).quantity;
+
+		return product.discountPrice * itemQuantity;
 	} catch (error) {
 		return -1;
 	}
@@ -95,6 +97,7 @@ cartSchema.methods.getCartTotal = async function (): Promise<number> {
 		for (const item of this.productList) {
 			const product = await Product.findById(item.product);
 			if (!product) return -1;
+
 			const itemTotal = await this.getItemTotal(product.name);
 			if (itemTotal === -1) return -1;
 			else total += itemTotal;

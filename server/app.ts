@@ -21,12 +21,12 @@ app.use(
 );
 
 // Store API
-app.use("/api/store/", storeRouter);
+app.use("/api/", storeRouter);
 
 //Test API
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
 	res.status(200).json({
-		success: true,
+		status: true,
 		message: "API Successful",
 	});
 });
