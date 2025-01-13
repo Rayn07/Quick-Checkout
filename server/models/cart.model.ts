@@ -4,11 +4,22 @@ import Product from "./product.model";
 export interface ICart extends Document {
 	user: Types.ObjectId;
 	store: Types.ObjectId;
-	productList: Array<{ product: Types.ObjectId; quantity: number }>;
-	addToCart: (productName: string) => Promise<boolean>;
-	reduceQuantity: (productName: string) => Promise<boolean>;
-	getItemTotal: (productName: string) => Promise<number>;
-	getCartTotal: () => Promise<number>;
+	productList: Array<{
+		product: Types.ObjectId;
+		quantity: number;
+		itemTotal: number;
+	}>;
+	cartTotal: number;
+	addToCart: (
+		productName: string
+	) => Promise<{ status: boolean; message: string }>;
+	reduceQuantity: (
+		productName: string
+	) => Promise<{ status: boolean; message: string }>;
+	updateItemPrice: (
+		productName: string
+	) => Promise<number | { status: boolean; message: string }>;
+	updateCartPrices: () => Promise<{ status: boolean; message: string }>;
 }
 
 const cartSchema: Schema<ICart> = new Schema(
@@ -19,92 +30,122 @@ const cartSchema: Schema<ICart> = new Schema(
 			{
 				product: { type: Schema.Types.ObjectId, ref: "Product" },
 				quantity: { type: Number },
+				itemTotal: { type: Number },
 			},
 		],
+		cartTotal: { type: Number },
 	},
 	{ timestamps: true }
 );
 
 cartSchema.methods.addToCart = async function (
 	productName: string
-): Promise<boolean> {
+): Promise<{ status: boolean; message: string }> {
 	try {
 		const product = await Product.findOne({
 			store: this.store,
 			name: productName,
 		});
-		if (!product) return false;
+		if (!product) return { status: false, message: "Product not found" };
 
-		this.productList.exists({ product: product._id }).then(() => {
-			this.productList.updateOne(
+		const productExists = await this.productList.exists({
+			product: product._id,
+		});
+		if (productExists) {
+			await this.productList.updateOne(
 				{ product: product._id },
 				{ $inc: { quantity: 1 } }
 			);
-			return true;
-		});
-
-		this.productList.push({ product: product._id, quantity: 1 });
-		return true;
-	} catch (error) {
-		return false;
+			return {
+				status: true,
+				message: "Successfully added product to cart",
+			};
+		} else {
+			this.productList.push({ product: product._id, quantity: 1 });
+			await this.save();
+			return {
+				status: true,
+				message: "Successfully added product to cart",
+			};
+		}
+	} catch (error: any) {
+		return { status: false, message: error.message };
 	}
 };
 
 cartSchema.methods.reduceQuantity = async function (
 	productName: string
-): Promise<boolean> {
+): Promise<{ status: boolean; message: string }> {
 	try {
 		const product = await Product.findOne({
 			store: this.store,
 			name: productName,
 		});
-		if (!product) return false;
+		if (!product) return { status: false, message: "Product not found" };
 
-		this.productList.updateOne(
+		await this.productList.updateOne(
 			{ product: product._id },
 			{ $inc: { quantity: -1 } }
 		);
-		return true;
-	} catch (error) {
-		return false;
+		return { status: true, message: "Successfully reduced quantity" };
+	} catch (error: any) {
+		return { status: false, message: error.message };
 	}
 };
 
-cartSchema.methods.getItemTotal = async function (
+cartSchema.methods.updateItemPrice = async function (
 	productName: string
-): Promise<number> {
+): Promise<number | { status: boolean; message: string }> {
 	try {
 		const product = await Product.findOne({
 			store: this.store,
 			name: productName,
 		});
-		if (!product) return -1;
+		if (!product) return { status: false, message: "Product not found" };
 
-		const itemQuantity = this.productList.find(
+		const itemQuantity = await this.productList.find(
 			(item: { product: Types.ObjectId; quantity: number }) =>
 				item.product === product._id
 		).quantity;
 
-		return product.discountPrice * itemQuantity;
-	} catch (error) {
-		return -1;
+		const itemTotal = product.discountPrice * itemQuantity;
+
+		await this.productList.updateOne(
+			{ product: product._id },
+			{ itemTotal }
+		);
+		return itemTotal;
+	} catch (error: any) {
+		return { status: false, message: error.message };
 	}
 };
 
-cartSchema.methods.getCartTotal = async function (): Promise<number> {
+cartSchema.methods.updateCartPrices = async function (): Promise<{
+	status: boolean;
+	message: string;
+}> {
 	try {
-		let total = 0;
+		let cartTotal = 0;
 		for (const item of this.productList) {
 			const product = await Product.findById(item.product);
-			if (!product) return -1;
+			if (!product)
+				return { status: false, message: "Product not found" };
 
-			const itemTotal = await this.getItemTotal(product.name);
-			if (itemTotal === -1) return -1;
-			else total += itemTotal;
+			const itemTotal = await this.updateItemPrice(product.name);
+			if (typeof itemTotal === "object" && itemTotal.status === false)
+				return { status: false, message: "Failed to get item total" };
+			else cartTotal += itemTotal as number;
 		}
-		return total;
-	} catch (error) {
-		return -1;
+
+		this.cartTotal = cartTotal;
+		await this.save();
+
+		return {
+			status: true,
+			message: "Successfully updated cart total",
+		};
+	} catch (error: any) {
+		return { status: false, message: error.message };
 	}
 };
 

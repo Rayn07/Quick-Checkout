@@ -210,6 +210,11 @@ export const getCartDetails = CatchAsyncError(
 				return next(new ErrorHandler("Cart not found", 404));
 			}
 
+			await cart.updateCartPrices().then((result) => {
+				if (!result.status)
+					return next(new ErrorHandler(result.message, 500));
+			});
+
 			res.json({ status: true, cart });
 		} catch (error: any) {
 			return next(new ErrorHandler(error.message, 500));
