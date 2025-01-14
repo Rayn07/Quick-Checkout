@@ -6,6 +6,7 @@ import {
 	getCartDetails,
 	addStore,
 	getStoreAndUser,
+	createProduct,
 } from "../controllers/store.controller";
 import { isAuthenticated } from "../middleware/auth";
 const storeRouter = express.Router();
@@ -65,9 +66,23 @@ storeRouter.get(
 	[{
 		"product": string,
 		"quantity": number,
-		"price": number
+		"itemTotal": number
 	}],
-"totalPrice": number
+"cartTotal": number
+} */
+
+storeRouter.post(
+	"/store/:storeName/createProduct",
+	isAuthenticated,
+	getStoreAndUser,
+	createProduct
+);
+/* Request Body: JSON 
+{
+"name": string,
+"mrp": string,
+"store": string,
+"image": string
 } */
 
 export default storeRouter;

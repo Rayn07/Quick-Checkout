@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
-import Product from "./product.model";
+import Product, { IProduct } from "./product.model";
 
 export interface ICart extends Document {
 	user: Types.ObjectId;
@@ -8,16 +8,17 @@ export interface ICart extends Document {
 		product: Types.ObjectId;
 		quantity: number;
 		itemTotal: number;
+		_id: Types.ObjectId;
 	}>;
 	cartTotal: number;
-	addToCart: (
+	addItem: (
 		productName: string
 	) => Promise<{ status: boolean; message: string }>;
-	reduceQuantity: (
+	removeItem: (
 		productName: string
 	) => Promise<{ status: boolean; message: string }>;
 	updateItemPrice: (
-		productName: string
+		productName: IProduct
 	) => Promise<number | { status: boolean; message: string }>;
 	updateCartPrices: () => Promise<{ status: boolean; message: string }>;
 }
@@ -38,7 +39,7 @@ const cartSchema: Schema<ICart> = new Schema(
 	{ timestamps: true }
 );
 
-cartSchema.methods.addToCart = async function (
+cartSchema.methods.addItem = async function (
 	productName: string
 ): Promise<{ status: boolean; message: string }> {
 	try {
@@ -48,14 +49,18 @@ cartSchema.methods.addToCart = async function (
 		});
 		if (!product) return { status: false, message: "Product not found" };
 
-		const productExists = await this.productList.exists({
-			product: product._id,
-		});
+		const productExists = this.productList.some(
+			(item: { product: Types.ObjectId }) =>
+				item.product.equals(product._id as Types.ObjectId)
+		);
+
 		if (productExists) {
-			await this.productList.updateOne(
-				{ product: product._id },
-				{ $inc: { quantity: 1 } }
+			await cartModel.updateOne(
+				{ _id: this._id },
+				{ $inc: { "productList.$[item].quantity": 1 } },
+				{ arrayFilters: [{ "item.product": product._id }] }
 			);
+
 			return {
 				status: true,
 				message: "Successfully added product to cart",
@@ -63,6 +68,7 @@ cartSchema.methods.addToCart = async function (
 		} else {
 			this.productList.push({ product: product._id, quantity: 1 });
 			await this.save();
+
 			return {
 				status: true,
 				message: "Successfully added product to cart",
@@ -73,7 +79,7 @@ cartSchema.methods.addToCart = async function (
 	}
 };
 
-cartSchema.methods.reduceQuantity = async function (
+cartSchema.methods.removeItem = async function (
 	productName: string
 ): Promise<{ status: boolean; message: string }> {
 	try {
@@ -83,10 +89,20 @@ cartSchema.methods.reduceQuantity = async function (
 		});
 		if (!product) return { status: false, message: "Product not found" };
 
-		await this.productList.updateOne(
-			{ product: product._id },
-			{ $inc: { quantity: -1 } }
+		const cart = await cartModel.findOneAndUpdate(
+			{ _id: this._id, "productList.product": product._id },
+			{ $inc: { "productList.$.quantity": -1 } },
+			{ new: true }
 		);
+
+		const item = cart?.productList.find((item) => item.quantity === 0);
+		if (item) {
+			await cartModel.updateOne(
+				{ _id: this._id },
+				{ $pull: { productList: { _id: item._id } } }
+			);
+		}
+
 		return { status: true, message: "Successfully reduced quantity" };
 	} catch (error: any) {
 		return { status: false, message: error.message };
@@ -94,26 +110,22 @@ cartSchema.methods.reduceQuantity = async function (
 };
 
 cartSchema.methods.updateItemPrice = async function (
-	productName: string
+	product: IProduct
 ): Promise<number | { status: boolean; message: string }> {
 	try {
-		const product = await Product.findOne({
-			store: this.store,
-			name: productName,
-		});
-		if (!product) return { status: false, message: "Product not found" };
-
-		const itemQuantity = await this.productList.find(
+		const itemQuantity = this.productList.find(
 			(item: { product: Types.ObjectId; quantity: number }) =>
-				item.product === product._id
+				item.product.equals(product._id as Types.ObjectId)
 		).quantity;
 
 		const itemTotal = product.discountPrice * itemQuantity;
 
-		await this.productList.updateOne(
-			{ product: product._id },
-			{ itemTotal }
+		await cartModel.updateOne(
+			{ _id: this._id },
+			{ $set: { "productList.$[item].itemTotal": itemTotal } },
+			{ arrayFilters: [{ "item.product": product._id }] }
 		);
+
 		return itemTotal;
 	} catch (error: any) {
 		return { status: false, message: error.message };
@@ -126,14 +138,19 @@ cartSchema.methods.updateCartPrices = async function (): Promise<{
 }> {
 	try {
 		let cartTotal = 0;
+
 		for (const item of this.productList) {
 			const product = await Product.findById(item.product);
 			if (!product)
 				return { status: false, message: "Product not found" };
 
-			const itemTotal = await this.updateItemPrice(product.name);
+			const itemTotal = await this.updateItemPrice(product);
+
 			if (typeof itemTotal === "object" && itemTotal.status === false)
-				return { status: false, message: "Failed to get item total" };
+				return {
+					status: false,
+					message: `Failed to get item total. ${itemTotal.message}`,
+				};
 			else cartTotal += itemTotal as number;
 		}
 

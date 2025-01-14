@@ -9,7 +9,7 @@ import userModel from "../models/user.model";
 export const addStore = CatchAsyncError(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const { name, address, location, image } = req.body;
+			const { name, address, location } = req.body;
 
 			if (!name || !address) {
 				return next(
@@ -17,19 +17,19 @@ export const addStore = CatchAsyncError(
 				);
 			}
 
-			const storeExists = await storeModel.findOne({ name, address });
+			const storeExists = await storeModel.findOne({ name, location });
 
 			if (storeExists) {
 				return next(
 					new ErrorHandler(
-						"Store at that address already exists!",
+						"Store at that location already exists!",
 						400
 					)
 				);
 			}
 
 			const storeData = req.body;
-			let store = new storeModel(storeData);
+			const store = new storeModel(storeData);
 			store
 				.save()
 				.then((result) => {
@@ -68,7 +68,10 @@ export const getStoreAndUser = CatchAsyncError(
 			}
 
 			res.locals.store = store;
+
 			res.locals.user = user;
+
+			next();
 		} catch (error: any) {
 			return next(new ErrorHandler(error.message, 500));
 		}
@@ -81,13 +84,16 @@ export const getStoreDetails = CatchAsyncError(
 			const user = res.locals.user;
 			const store = res.locals.store;
 
-			const cart = await new cartModel({
+			let cart = await cartModel.findOne({
 				user: user._id,
 				store: store._id,
-			}).save();
+			});
 
 			if (!cart) {
-				return next(new ErrorHandler("Cart creation failed", 500));
+				cart = await new cartModel({
+					user: user._id,
+					store: store._id,
+				}).save();
 			}
 
 			await userModel.findOneAndUpdate(
@@ -120,7 +126,7 @@ export const addProduct = CatchAsyncError(
 				return next(new ErrorHandler("Product not found", 404));
 			}
 
-			let cart = await cartModel.findOne({
+			const cart = await cartModel.findOne({
 				user: user._id,
 				store: store._id,
 			});
@@ -129,21 +135,21 @@ export const addProduct = CatchAsyncError(
 				return next(new ErrorHandler("Cart not found", 404));
 			}
 
-			cart.addToCart(productName)
-				.then(() => {
+			cart.addItem(productName).then((result) => {
+				if (result.status) {
 					res.json({
 						status: true,
 						message: "Product added to cart",
 					});
-				})
-				.catch((error: any) => {
+				} else {
 					return next(
 						new ErrorHandler(
-							`Failed to add product to cart ${error.message}`,
+							`Failed to add product to cart. ${result.message}`,
 							500
 						)
 					);
-				});
+				}
+			});
 		} catch (error: any) {
 			return next(new ErrorHandler(error.message, 500));
 		}
@@ -165,7 +171,7 @@ export const removeProduct = CatchAsyncError(
 				return next(new ErrorHandler("Product not found", 404));
 			}
 
-			let cart = await cartModel.findOne({
+			const cart = await cartModel.findOne({
 				user: user._id,
 				store: store._id,
 				productList: { $elemMatch: { product: product._id } },
@@ -175,7 +181,7 @@ export const removeProduct = CatchAsyncError(
 				return next(new ErrorHandler("Product not in cart", 404));
 			}
 
-			cart.reduceQuantity(productName)
+			cart.removeItem(productName)
 				.then(() => {
 					res.json({
 						status: true,
@@ -185,7 +191,7 @@ export const removeProduct = CatchAsyncError(
 				.catch((error: any) => {
 					return next(
 						new ErrorHandler(
-							`Failed to reduce product quantity ${error.message}`,
+							`Failed to reduce product quantity. ${error.message}`,
 							500
 						)
 					);
@@ -216,6 +222,44 @@ export const getCartDetails = CatchAsyncError(
 			});
 
 			res.json({ status: true, cart });
+		} catch (error: any) {
+			return next(new ErrorHandler(error.message, 500));
+		}
+	}
+);
+
+export const createProduct = CatchAsyncError(
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			for (const eachProduct of req.body) {
+				const { name, mrp, store } = eachProduct;
+				if (!name || !mrp || !store) {
+					return next(
+						new ErrorHandler("Name, MRP and Store required!", 400)
+					);
+				}
+
+				const storeDoc = await storeModel.findOne({ name: store });
+				if (!storeDoc) {
+					return next(new ErrorHandler("Store not found", 404));
+				}
+
+				const productData = { name, mrp, store: storeDoc._id };
+				const product = new productModel(productData);
+				product.save().catch((error: any) => {
+					return next(
+						new ErrorHandler(
+							`Product Creation Failed. ${error.message}`,
+							500
+						)
+					);
+				});
+			}
+
+			res.json({
+				status: true,
+				message: "Products created successfully",
+			});
 		} catch (error: any) {
 			return next(new ErrorHandler(error.message, 500));
 		}

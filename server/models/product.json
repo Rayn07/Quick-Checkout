@@ -1,0 +1,42 @@
+[
+	{
+		"name": "Masala Dabba",
+		"mrp": 549,
+		"store": "DMart"
+	},
+	{
+		"name": "Steel Tiffin",
+		"mrp": 299,
+		"store": "Star Bazaar"
+	},
+	{
+		"name": "Cotton Bedsheet",
+		"mrp": 899,
+		"store": "Spar"
+	},
+	{
+		"name": "Copper Water Bottle",
+		"mrp": 699,
+		"store": "DMart"
+	},
+	{
+		"name": "Pressure Cooker",
+		"mrp": 1299,
+		"store": "Star Bazaar"
+	},
+	{
+		"name": "Tea Strainer",
+		"mrp": 149,
+		"store": "Spar"
+	},
+	{
+		"name": "Door Mat",
+		"mrp": 249,
+		"store": "DMart"
+	},
+	{
+		"name": "Pooja Thali",
+		"mrp": 399,
+		"store": "Star Bazaar"
+	}
+]

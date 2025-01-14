@@ -12,7 +12,7 @@ const productSchema: Schema<IProduct> = new Schema(
 	{
 		name: { type: String, required: true },
 		mrp: { type: Number, required: true },
-		store: { type: Schema.Types.ObjectId, ref: "Store" },
+		store: { type: Schema.Types.ObjectId, ref: "Store", required: true },
 		discountPrice: { type: Number },
 		image: { type: String },
 	},
