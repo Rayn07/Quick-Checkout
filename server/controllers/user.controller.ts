@@ -1,11 +1,9 @@
-// controllers/user.controller.ts
 import { Request, Response, NextFunction } from "express";
 import userModel, { IUser } from "../models/user.model";
 import { CookieOptions } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ErrorHandler } from "../middleware/error";
 
-// Extend Express Request type to include user
 declare global {
   namespace Express {
     interface Request {
