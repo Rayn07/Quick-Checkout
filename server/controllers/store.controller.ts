@@ -52,7 +52,28 @@ export const addStore = CatchAsyncError(
 	}
 );
 
-export const getStoreAndUser = CatchAsyncError(
+export const searchStore = CatchAsyncError(
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const query = req.query.store as String;
+			const pattern = "^" + query + ".*$";
+			const results = query
+				? await storeModel.find({
+						name: { $regex: pattern, $options: "i" },
+				  })
+				: await storeModel.find();
+
+			res.json({
+				status: true,
+				results,
+			});
+		} catch (error: any) {
+			return next(new ErrorHandler(error.message, 500));
+		}
+	}
+);
+
+export const saveStore = CatchAsyncError(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const storeName = req.params.storeName;
@@ -69,8 +90,6 @@ export const getStoreAndUser = CatchAsyncError(
 
 			res.locals.store = store;
 
-			res.locals.user = user;
-
 			next();
 		} catch (error: any) {
 			return next(new ErrorHandler(error.message, 500));
@@ -81,17 +100,17 @@ export const getStoreAndUser = CatchAsyncError(
 export const getStoreDetails = CatchAsyncError(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const user = res.locals.user;
+			const user = req.user;
 			const store = res.locals.store;
 
 			let cart = await cartModel.findOne({
-				user: user._id,
+				user: user?._id,
 				store: store._id,
 			});
 
 			if (!cart) {
 				cart = await new cartModel({
-					user: user._id,
+					user: user?._id,
 					store: store._id,
 				}).save();
 			}
@@ -115,7 +134,7 @@ export const addProduct = CatchAsyncError(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const productName = req.body.productName;
-			const user = res.locals.user;
+			const user = req.user;
 			const store = res.locals.store;
 
 			const product = await productModel.findOne({
@@ -127,7 +146,7 @@ export const addProduct = CatchAsyncError(
 			}
 
 			const cart = await cartModel.findOne({
-				user: user._id,
+				user: user?._id,
 				store: store._id,
 			});
 
@@ -160,7 +179,7 @@ export const removeProduct = CatchAsyncError(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const productName = req.body.productName;
-			const user = res.locals.user;
+			const user = req.user;
 			const store = res.locals.store;
 
 			const product = await productModel.findOne({
@@ -172,7 +191,7 @@ export const removeProduct = CatchAsyncError(
 			}
 
 			const cart = await cartModel.findOne({
-				user: user._id,
+				user: user?._id,
 				store: store._id,
 				productList: { $elemMatch: { product: product._id } },
 			});
@@ -205,10 +224,10 @@ export const removeProduct = CatchAsyncError(
 export const getCartDetails = CatchAsyncError(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const user = res.locals.user;
+			const user = req.user;
 			const store = res.locals.store;
 			const cart = await cartModel.findOne({
-				user: user._id,
+				user: user?._id,
 				store: store._id,
 			});
 

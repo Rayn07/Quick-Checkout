@@ -50,13 +50,14 @@ export const registerUser = CatchAsyncError(
 				email,
 				password,
 			});
+			const userDetails = { username: user?.name, email: user?.email };
 			const accessToken = user.SignAccessToken();
 			const refreshToken = user.SignRefreshToken();
 			res.cookie("access_token", accessToken, accessTokenOptions);
 			res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 			res.status(201).json({
 				status: true,
-				user,
+				userDetails,
 			});
 		} catch (error: any) {
 			return next(new ErrorHandler(error.message, 500));
@@ -74,6 +75,7 @@ export const loginUser = CatchAsyncError(
 				);
 			}
 			const user = await userModel.findOne({ email }).select("+password");
+			const userDetails = { username: user?.name, email: user?.email };
 			if (!user) {
 				return next(new ErrorHandler("Invalid credentials", 401));
 			}
@@ -87,7 +89,7 @@ export const loginUser = CatchAsyncError(
 			res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 			res.status(200).json({
 				status: true,
-				user,
+				userDetails,
 			});
 		} catch (error: any) {
 			return next(new ErrorHandler(error.message, 500));

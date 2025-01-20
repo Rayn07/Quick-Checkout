@@ -5,8 +5,9 @@ import {
 	removeProduct,
 	getCartDetails,
 	addStore,
-	getStoreAndUser,
+	saveStore,
 	createProduct,
+	searchStore,
 } from "../controllers/store.controller";
 import { isAuthenticated } from "../middleware/auth";
 const storeRouter = express.Router();
@@ -24,10 +25,16 @@ storeRouter.post("/store/add-store", isAuthenticated, addStore);
 "image": string
 } */
 
+storeRouter.get("/store/search", isAuthenticated, searchStore);
+/* Request Query: JSON
+{
+	"store": string	
+} */
+
 storeRouter.get(
 	"/store/:storeName",
 	isAuthenticated,
-	getStoreAndUser,
+	saveStore,
 	getStoreDetails
 );
 /* Response Body: JSON 
@@ -41,7 +48,7 @@ storeRouter.get(
 storeRouter.post(
 	"/store/:storeName/add-product",
 	isAuthenticated,
-	getStoreAndUser,
+	saveStore,
 	addProduct
 );
 /* Request Body: JSON { "productName": string } */
@@ -49,7 +56,7 @@ storeRouter.post(
 storeRouter.post(
 	"/store/:storeName/remove-product",
 	isAuthenticated,
-	getStoreAndUser,
+	saveStore,
 	removeProduct
 );
 /* Request Body: JSON { "productName": string } */
@@ -57,7 +64,7 @@ storeRouter.post(
 storeRouter.get(
 	"/store/:storeName/cart",
 	isAuthenticated,
-	getStoreAndUser,
+	saveStore,
 	getCartDetails
 );
 /* Response Body: JSON 
@@ -74,7 +81,7 @@ storeRouter.get(
 storeRouter.post(
 	"/store/:storeName/createProduct",
 	isAuthenticated,
-	getStoreAndUser,
+	saveStore,
 	createProduct
 );
 /* Request Body: JSON 
