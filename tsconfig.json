@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "es2016",                                  /* Set the JavaScript language version for emitted JavaScript */
+    "module": "commonjs",                                /* Specify what module code is generated */
+    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for CommonJS modules */
+    "forceConsistentCasingInFileNames": true,             /* Ensure consistent casing in imports */
+
+    /* Directories */
+    "outDir": "./dist",                                  /* Specify the output folder for compiled files */
+    "rootDir": "./src",                                  /* Specify the root folder for your source files */
+
+    /* Type Checking */
+    "strict": true,                                      /* Enable strict type-checking options */
+
+    /* Module Resolution */
+    "moduleResolution": "node",                          /* Use Node.js module resolution strategy */
+
+    /* Emit */
+    "sourceMap": true,                                   /* Create source map files */
+    "removeComments": true,                              /* Remove comments from the compiled files */
+
+    /* Library */
+    "skipLibCheck": true                                 /* Skip type checking of declaration files */
+  },
+  "include": [
+    "src/**/*"  /* Include all files in the 'src' directory */
+  ],
+  "exclude": [
+    "node_modules"  /* Exclude 'node_modules' folder */
+  ]
+}
