@@ -14,23 +14,23 @@ userRouter.get("/user", isAuthenticated, (req: Request, res: Response) => {
 userRouter.post("/user/register", registerUser);
 /* Request Body: JSON 
 {
-"name": string,
-"email": string,
-"password": string,
+	"name": string,
+	"email": string,
+	"password": string,
 } */
 
 userRouter.post("/user/login", loginUser);
 /* Request Body: JSON
 {
-"email": string,
-"password": string,
+	"email": string,
+	"password": string,
 } */
 
 userRouter.get("/user/logout", isAuthenticated, logoutUser);
 /* Response Body: JSON
 {
-"status": boolean,
-"message": string,
+	"status": boolean,
+	"message": string,
 } */
 
 export default userRouter;

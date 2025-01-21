@@ -19,17 +19,20 @@ storeRouter.get("/store", isAuthenticated, (req: Request, res: Response) => {
 storeRouter.post("/store/add-store", isAuthenticated, addStore);
 /* Request Body: JSON 
 {
-"name": string,
-"address": string,
-"location": string,
-"image": string
+	"name": string,
+	"address": string,
+	"location": string,
+	"image": string
 } */
 
 storeRouter.get("/store/search", isAuthenticated, searchStore);
-/* Request Query: JSON
-{
-	"store": string	
-} */
+/* Response Body: JSON
+"storeDetails":
+	[{
+		"name": string,
+		"address": string,
+		"location": string,
+	}] */
 
 storeRouter.get(
 	"/store/:storeName",
@@ -38,11 +41,12 @@ storeRouter.get(
 	getStoreDetails
 );
 /* Response Body: JSON 
+"store": 
 {
-"name": string,
-"image": string,
-"address": string,
-"location": string,
+	"name": string,
+	"image": string,
+	"address": string,
+	"location": string,
 } */
 
 storeRouter.post(
@@ -79,17 +83,17 @@ storeRouter.get(
 } */
 
 storeRouter.post(
-	"/store/:storeName/createProduct",
+	"/store/:storeName/create-product",
 	isAuthenticated,
 	saveStore,
 	createProduct
 );
 /* Request Body: JSON 
 {
-"name": string,
-"mrp": string,
-"store": string,
-"image": string
+	"name": string,
+	"mrp": string,
+	"store": string,
+	"image": string
 } */
 
 export default storeRouter;

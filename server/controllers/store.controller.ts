@@ -65,7 +65,7 @@ export const searchStore = CatchAsyncError(
 
 			res.json({
 				status: true,
-				results,
+				storeDetails: results,
 			});
 		} catch (error: any) {
 			return next(new ErrorHandler(error.message, 500));
