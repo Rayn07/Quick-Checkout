@@ -1,16 +1,22 @@
 require("dotenv").config();
 import express, { Express, NextFunction, Request, Response } from "express";
 import cors from "cors";
+import path from "path";
 import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middleware/error";
 import storeRouter from "./routes/store.route";
 import userRouter from "./routes/user.route";
-import purchaseRouter from "./routes/purchase.route";
+import paymentRouter from "./routes/payment.route";
 
 export const app: Express = express();
 
 //body parser
 app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+//view engine
+app.use(express.static(path.join(__dirname, "public")));
+app.set("view engine", "ejs");
 
 //cookie parser
 app.use(cookieParser());
@@ -23,7 +29,7 @@ app.use(
 );
 
 // Store API
-app.use("/api/", storeRouter, userRouter, purchaseRouter);
+app.use("/api/", storeRouter, userRouter, paymentRouter);
 
 //Test API
 app.get("/", (req: Request, res: Response, next: NextFunction) => {

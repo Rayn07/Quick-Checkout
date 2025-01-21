@@ -5,7 +5,7 @@ export interface ICart extends Document {
 	user: Types.ObjectId;
 	store: Types.ObjectId;
 	productList: Array<{
-		product: Types.ObjectId;
+		product: IProduct;
 		quantity: number;
 		itemTotal: number;
 		_id: Types.ObjectId;
