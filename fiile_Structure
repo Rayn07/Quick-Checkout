@@ -1,0 +1,23 @@
+structure of the files should be 
+main_file
+|
+|--src
+|  |--- controllers
+|  |
+|  |---middleware
+|  |
+|  |--node_modules
+|  |
+|  |--routes
+|  |
+|  |--services
+|  |
+|  |--types
+|  |
+|  |--utils
+|--app.ts
+|--env 
+|--package.json
+|--package.lock.json
+|--tsconfig.json
+|--dist(all the transcripted javascript files are saved here )
