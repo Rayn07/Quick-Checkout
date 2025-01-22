@@ -32,7 +32,8 @@ export const getPaymentAmount = CatchAsyncError(
 	}
 );
 
-export const generateBill = CatchAsyncError(
+// For testing
+export const generateBillTest = CatchAsyncError(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const id = req.params.cartId;
@@ -62,6 +63,8 @@ export const generateBill = CatchAsyncError(
 				items,
 				total: cart.cartTotal,
 			};
+			const billDataString = `${billData}`;
+			console.log(billDataString);
 
 			await purchaseModel.updateOne(
 				{ _id: newPurchase._id },
@@ -77,29 +80,23 @@ export const generateBill = CatchAsyncError(
 	}
 );
 
-// export const sendBill = async (req: Request, res: Response): Promise<void> => {
-// 	const { email, billData: billDataString } = req.body as SendBillRequestBody;
+export const sendBill = CatchAsyncError(
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const email = req.user?.email;
+			const billDetails: BillData = res.locals.billData;
 
-// 	if (!email || !billDataString) {
-// 		res.status(400).send("Email and bill data are required");
-// 		return;
-// 	}
+			if (!email || !billDetails) {
+				return next(
+					new ErrorHandler("Email and Bill Data Unavailable", 400)
+				);
+			}
 
-// 	try {
-// 		const billDetails: BillData = JSON.parse(billDataString);
+			await sendBillEmail(email, billDetails);
 
-// 		const validation = validateItems(billDetails.items);
-// 		if (!validation.valid) {
-// 			res.status(400).send(validation.message);
-// 			return;
-// 		}
-
-// 		billDetails.total = calculateTotal(billDetails.items);
-
-// 		await sendBillEmail(email, billDetails);
-// 		res.status(200).send("Bill sent successfully");
-// 	} catch (error) {
-// 		console.error("Error processing bill data:", error);
-// 		res.status(500).send("Failed to process or send bill");
-// 	}
-// };
+			res.render("bill", { bill: billDetails });
+		} catch (error: any) {
+			return next(new ErrorHandler(error.message, 500));
+		}
+	}
+);
