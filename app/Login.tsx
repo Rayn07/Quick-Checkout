@@ -23,26 +23,24 @@ const colors = {
 	text: "#000000",
 };
 
-type RootStackParamList = {
+type RootStackScreens = {
 	Login: undefined;
 	"(tabs)": { screen: string };
 };
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type NavigationProp = NativeStackNavigationProp<RootStackScreens>;
 
 const Login = () => {
-	const navigation = useNavigation<NavigationProp>();
+	const navigation = useNavigation() as NavigationProp;
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
 	const handleLogin = async () => {
 		try {
-			console.log("Login attempted", { email, password });
-
 			const res = await api.post("/user/login", { email: email, password: password });
 			const username = res.data.userDetails.username;
-			if (res.status) {
+			if (res.data.status) {
 				navigation.navigate("(tabs)", { screen: "home" });
 			}
 		} catch (error) {

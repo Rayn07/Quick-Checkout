@@ -8,75 +8,82 @@ const colors = {
   };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    keyboardContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      paddingHorizontal: 20,
-    },
-    headerContainer: {
-      alignItems: 'center',
-      marginBottom: 30,
-    },
-    headerText: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: colors.text,
-    },
-    inputContainer: {
-      marginBottom: 20,
-    },
-    inputWrapper: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      borderBottomWidth: 1,
-      borderBottomColor: colors.gray,
-      marginBottom: 15,
-    },
-    icon: {
-      marginRight: 10,
-    },
-    input: {
-      flex: 1,
-      height: 40,
-      color: colors.text,
-    },
-    forgotPasswordContainer: {
-      alignSelf: 'flex-end',
-    },
-    forgotPasswordText: {
-      color: colors.primary,
-      fontSize: 12,
-    },
-    buttonContainer: {
-      marginTop: 20,
-    },
-    loginButton: {
-      backgroundColor: colors.primary,
-      padding: 15,
-      borderRadius: 25,
-      alignItems: 'center',
-    },
-    loginButtonText: {
-      color: colors.background,
-      fontSize: 16,
-      fontWeight: 'bold',
-    },
-    registerLinkContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      marginTop: 15,
-    },
-    registerText: {
-      color: colors.text,
-    },
-    registerLinkText: {
-      color: colors.primary,
-      fontWeight: 'bold',
-    },
-  });
+	container: {
+		flex: 1,
+		backgroundColor: colors.background,
+	},
+	keyboardContainer: {
+		flex: 1,
+		justifyContent: "center",
+		paddingHorizontal: 20,
+	},
+	headerContainer: {
+		alignItems: "center",
+		marginBottom: 30,
+	},
+	headerText: {
+		fontSize: 24,
+		fontWeight: "bold",
+		color: colors.text,
+	},
+	inputContainer: {
+		marginBottom: 20,
+	},
+	inputWrapper: {
+		flexDirection: "row",
+		alignItems: "center",
+		borderBottomWidth: 1,
+		borderBottomColor: colors.gray,
+		marginBottom: 15,
+	},
+	icon: {
+		marginRight: 10,
+	},
+	input: {
+		flex: 1,
+		height: 40,
+		color: colors.text,
+	},
+	forgotPasswordContainer: {
+		alignSelf: "flex-end",
+	},
+	forgotPasswordText: {
+		color: colors.primary,
+		fontSize: 12,
+	},
+	buttonContainer: {
+		marginTop: 20,
+	},
+	loginButton: {
+		backgroundColor: colors.primary,
+		padding: 15,
+		borderRadius: 25,
+		alignItems: "center",
+	},
+	loginButtonText: {
+		color: colors.background,
+		fontSize: 16,
+		fontWeight: "bold",
+	},
+	registerLinkContainer: {
+		flexDirection: "row",
+		justifyContent: "center",
+		marginTop: 15,
+	},
+	registerText: {
+		color: colors.text,
+	},
+	registerLinkText: {
+		color: colors.primary,
+		fontWeight: "bold",
+	},
+	passwordMismatchContainer: {
+		flexDirection: "row",
+		justifyContent: "center",
+	},
+	passwordMismatchText: {
+		color: "red",
+	},
+});
 
   export default styles;

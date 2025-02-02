@@ -1,19 +1,40 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import homestyles from "../Styles/HomeStyles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import profilestyles from "../Styles/ProfileStyles";
+import api from "@/api";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "expo-router";
 import {
-  AntDesign,
-  Feather,
-  FontAwesome,
-  Ionicons,
-  MaterialCommunityIcons,
-  SimpleLineIcons,
+	AntDesign,
+	Feather,
+	FontAwesome,
+	Ionicons,
+	MaterialCommunityIcons,
+	SimpleLineIcons,
 } from "@expo/vector-icons";
-import { Link } from "expo-router";
+
+type RootStackScreens = {
+	Login: undefined;
+	"(tabs)": { screen: string };
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackScreens>;
 
 const profile = () => {
+	const navigation = useNavigation() as NavigationProp;
+	const handleLogOut = async () => {
+		try {
+			const res = await api.get("/user/logout");
+			console.log(res.data);
+			if (res.data.status) {
+				navigation.navigate("Login");
+			}
+		} catch (error: any) {
+			console.error("Error logging out:", error);
+		}
+	};
+
 	return (
 		<SafeAreaView style={profilestyles.profileContainer}>
 			<View style={profilestyles.profileTopBar}>
@@ -174,16 +195,16 @@ const profile = () => {
 							</View>
 						</View>
 					</View>
-					<Link href="/Login">
-						<View style={profilestyles.profileLogOut}>
-							<View>
-								<AntDesign size={32} name="poweroff" />
-							</View>
-							<View>
-								<Text style={{ marginLeft: 8, fontSize: 16 }}>Log Out</Text>
-							</View>
+					<TouchableOpacity style={profilestyles.profileLogOut} onPress={handleLogOut}>
+						<View>
+							<AntDesign size={24} name="poweroff" />
 						</View>
-					</Link>
+						<View>
+							<Text style={{ marginLeft: 8, fontSize: 16, fontWeight: "bold" }}>
+								Log Out
+							</Text>
+						</View>
+					</TouchableOpacity>
 				</View>
 			</View>
 		</SafeAreaView>
