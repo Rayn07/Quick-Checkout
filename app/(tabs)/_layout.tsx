@@ -9,6 +9,8 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import iconstyles from "../Styles/IconStyles";
 import {
+  AntDesign,
+  Entypo,
   FontAwesome6,
   MaterialCommunityIcons,
   Octicons,
@@ -34,10 +36,10 @@ export default function TabLayout() {
               transform: [{ scale: 1 }],
               transitionProperty: "none",
               WebkitTapHighlightColor: "transparent",
-              backgroundColor: "white", // Set the tab bar background to white here
+              backgroundColor: "white",
             },
             default: {
-              backgroundColor: "white", // Set the tab bar background to white for default (Android)
+              backgroundColor: "white",
             },
           }),
         }}
@@ -52,11 +54,11 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="merchant"
+          name="cart"
           options={{
-            title: "Merchant",
+            title: "Cart",
             tabBarIcon: ({ color }) => (
-              <FontAwesome6 size={24} name="shop" color={color} />
+              <Entypo size={28} name="shopping-cart" color={color} />
             ),
           }}
         />

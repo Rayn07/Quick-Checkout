@@ -67,14 +67,10 @@ const homestyles = StyleSheet.create({
   },
 
   searchBarArea: {
+    width: "90%", // Full screen width minus padding
+    alignSelf: "center",
     flexDirection: "row",
-    width: "100%",
-    justifyContent: "center",
-    height: 72,
-    padding: 8,
-    paddingTop: 12,
-    paddingLeft: 32,
-    paddingRight: 32,
+    marginTop: 10,
   },
 
   searchIcon: {
@@ -92,10 +88,9 @@ const homestyles = StyleSheet.create({
   },
 
   searchBarContainer: {
-    width: "100%",
+    flex: 1,
     height: 48,
     justifyContent: "center",
-    padding: 8,
     backgroundColor: "white",
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
@@ -111,8 +106,12 @@ const homestyles = StyleSheet.create({
     backgroundColor: "white",
     height: 48,
     width: "100%",
+    paddingHorizontal: 10,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
     borderTopWidth: 1,
     borderBottomWidth: 1,
+    borderRightWidth: 1,
     borderColor: "#c1c1c1",
   },
 
@@ -121,6 +120,36 @@ const homestyles = StyleSheet.create({
     fontSize: 42,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  shopList: {
+    width: "90%",
+    alignSelf: "center",
+  },
+  shopItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    backgroundColor: "white",
+  },
+  shopName: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  shopDetails: {
+    flexDirection: "row",
+    marginTop: 5,
+    gap: 10,
+  },
+  shopRating: {
+    color: "#666",
+  },
+  shopCategory: {
+    color: "#666",
+  },
+  noResults: {
+    textAlign: "center",
+    padding: 20,
+    color: "#666",
   },
 });
 
