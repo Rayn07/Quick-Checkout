@@ -67,7 +67,7 @@ const homestyles = StyleSheet.create({
   },
 
   searchBarArea: {
-    width: "90%", // Full screen width minus padding
+    width: "90%",
     alignSelf: "center",
     flexDirection: "row",
     marginTop: 10,
@@ -150,6 +150,62 @@ const homestyles = StyleSheet.create({
     textAlign: "center",
     padding: 20,
     color: "#666",
+  },
+  checkoutBar: {
+    width: "100%",
+    height: 60,
+    backgroundColor: "white",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    position: "absolute",
+    bottom: 0,
+    borderTopWidth: 0.25,
+  },
+
+  checkoutContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  storenameText: {
+    fontWeight: "bold",
+  },
+  viewcartText: {
+    fontSize: 12,
+    color: "blue",
+  },
+
+  checkoutText: {
+    color: "rgb(248,76,76)",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+
+  checkoutButton: {
+    backgroundColor: "rgb(248,76,76)",
+    borderRadius: 50,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkoutButtonContainer: {
+    backgroundColor: "rgb(248,76,76)",
+    width: 128,
+    height: 42,
+    marginRight: -20,
+    alignItems: "center",
+    flexDirection: "row",
+    borderRadius: 10,
+    padding: 8,
+  },
+  checkoutButtonText: {
+    fontWeight: "semibold",
+    color: "white",
+    fontSize: 16,
   },
 });
 

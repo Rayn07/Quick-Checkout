@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import homestyles from "../Styles/HomeStyles";
-import { cartStyles } from "../Styles/CartStyles";
+import homestyles from "./Styles/HomeStyles";
+import { cartStyles } from "./Styles/CartStyles";
 
 interface CartItem {
   id: string;
@@ -19,28 +19,28 @@ const Cart: React.FC = () => {
       name: "Coffee",
       price: 10,
       quantity: 2,
-      image: require("../../assets/images/coffee.jpg"),
+      image: require("../assets/images/coffee.jpg"),
     },
     {
       id: "2",
       name: "Pastry",
       price: 20,
       quantity: 1,
-      image: require("../../assets/images/coffee.jpg"),
+      image: require("../assets/images/coffee.jpg"),
     },
     {
       id: "3",
       name: "Sandwich",
       price: 30,
       quantity: 1,
-      image: require("../../assets/images/coffee.jpg"),
+      image: require("../assets/images/coffee.jpg"),
     },
     {
       id: "4",
       name: "Sandwich",
       price: 40,
       quantity: 1,
-      image: require("../../assets/images/coffee.jpg"),
+      image: require("../assets/images/coffee.jpg"),
     },
   ]);
 

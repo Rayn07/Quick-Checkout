@@ -54,11 +54,11 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="cart"
+          name="merchant"
           options={{
-            title: "Cart",
+            title: "Merchant",
             tabBarIcon: ({ color }) => (
-              <Entypo size={28} name="shopping-cart" color={color} />
+              <FontAwesome6 size={24} name="shop" color={color} />
             ),
           }}
         />

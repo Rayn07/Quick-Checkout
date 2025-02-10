@@ -1,8 +1,8 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import homestyles from "../Styles/HomeStyles";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Fontisto, Octicons } from "@expo/vector-icons";
+import { Fontisto, Octicons, MaterialIcons } from "@expo/vector-icons";
 import {
   GestureHandlerRootView,
   TextInput,
@@ -94,6 +94,24 @@ const Home: React.FC = () => {
             }
           />
         )}
+        <View style={homestyles.checkoutBar}>
+          <View style={homestyles.checkoutContent}>
+            <View style={homestyles.checkoutButton}>
+              <MaterialIcons name="shopping-cart" size={24} color="white" />
+            </View>
+            <View>
+              <Text style={homestyles.storenameText}>Store Name</Text>
+              <Link href="/cart">
+                <Text style={homestyles.viewcartText}>View Cart</Text>
+              </Link>
+            </View>
+          </View>
+          <View style={homestyles.checkoutButtonContainer}>
+            <Link href="/cart">
+              <Text style={homestyles.checkoutButtonText}>Checkout</Text>
+            </Link>
+          </View>
+        </View>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
