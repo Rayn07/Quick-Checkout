@@ -9,6 +9,8 @@ import {
 import React from "react";
 import storestyles from "./Styles/StoreStyles";
 import { FontAwesome5, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import homestyles from "./Styles/HomeStyles";
+import { Link } from "expo-router";
 
 const dmartImage = require("../assets/images/DMART.jpg");
 
@@ -64,19 +66,23 @@ const store = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={storestyles.checkoutBar}>
-        <View style={storestyles.checkoutContent}>
-          <View style={storestyles.cartButton}>
-            <Text style={storestyles.cartIcon}>🛒</Text>
+      <View style={homestyles.checkoutBar}>
+        <View style={homestyles.checkoutContent}>
+          <View style={homestyles.checkoutButton}>
+            <MaterialIcons name="shopping-cart" size={24} color="white" />
           </View>
           <View>
-            <Text style={storestyles.storenameText}>Store Name</Text>
-            <Text style={storestyles.viewcartText}>View Cart</Text>
+            <Text style={homestyles.storenameText}>Store Name</Text>
+            <Link href="/cart">
+              <Text style={homestyles.viewcartText}>View Cart</Text>
+            </Link>
           </View>
         </View>
-        <TouchableOpacity style={storestyles.checkoutButtonContainer}>
-          <Text style={storestyles.checkoutButtonText}>Checkout</Text>
-        </TouchableOpacity>
+        <View style={homestyles.checkoutButtonContainer}>
+          <Link href="/cart">
+            <Text style={homestyles.checkoutButtonText}>Checkout</Text>
+          </Link>
+        </View>
       </View>
     </View>
   );
