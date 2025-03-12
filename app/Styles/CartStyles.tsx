@@ -32,3 +32,5 @@ export const cartStyles = StyleSheet.create({
     backgroundColor: "rgb(248,76,76)",
   },
 });
+
+export default cartStyles;
