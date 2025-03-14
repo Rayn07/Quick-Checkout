@@ -103,7 +103,12 @@ const Login = () => {
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Link href="/(tabs)/home">
+            <Link
+              href={{
+                pathname: "/(tabs)/home",
+                params: { email: email },
+              }}
+            >
               <Text style={styles.loginButtonText}>Login</Text>
             </Link>
           </TouchableOpacity>

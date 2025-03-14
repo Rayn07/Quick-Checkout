@@ -8,7 +8,7 @@ import {
   TextInput,
   FlatList,
 } from "react-native-gesture-handler";
-import { Link } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import api from "@/api";
 
 interface Store {
@@ -18,6 +18,8 @@ interface Store {
 }
 
 const Home: React.FC = () => {
+  const { email } = useLocalSearchParams();
+
   const [inputValue, setInputValue] = useState<string>("");
   const [filteredStores, setFilteredStores] = useState<Store[]>([]);
 
