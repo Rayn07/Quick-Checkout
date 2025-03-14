@@ -43,9 +43,6 @@ const Login = () => {
         password: password,
       });
       const username = res.data.userDetails.username;
-      if (res.data.status) {
-        navigation.navigate("(tabs)", { screen: "home" });
-      }
     } catch (error) {
       console.error("Error logging in:", error);
     }
