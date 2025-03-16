@@ -15,7 +15,7 @@ export type RootStackScreens = {
 	Register: undefined;
 	cart: CartRouteParams;
 	store: undefined;
-	"(tabs)": { screen: string };
+	"(tabs)": { screen: string; params: {} };
 };
 
 export type NavigationProp = NativeStackNavigationProp<RootStackScreens>;

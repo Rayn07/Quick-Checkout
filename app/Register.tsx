@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
+	View,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	KeyboardAvoidingView,
+	Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome5, Fontisto, MaterialIcons } from "@expo/vector-icons";
@@ -24,6 +24,7 @@ const colors = {
 const Register = () => {
 	const navigation = useNavigation() as NavigationProp;
 
+	const [errorMessage, setErrorMessage] = useState("");
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -39,11 +40,14 @@ const Register = () => {
 					password: password,
 				});
 				if (res.data.status) {
-					navigation.navigate("(tabs)", { screen: "home" });
+					navigation.navigate("(tabs)", { screen: "home", params: { username, email } });
 				}
+				console.log("User Registered:", username);
 			} else setPasswordMatch(false);
-		} catch (error) {
-			console.error("Error registering user:", error);
+		} catch (error: any) {
+			const errorMsg = error.response.data.message;
+			setErrorMessage(errorMsg);
+			console.error(error.status, "Error with User Registration:", errorMsg);
 		}
 	};
 

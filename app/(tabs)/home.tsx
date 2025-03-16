@@ -20,13 +20,13 @@ interface Store {
 }
 
 const Home: React.FC = () => {
-  const { email } = useLocalSearchParams();
-	const navigation = useNavigation() as NavigationProp;
+  const { username, email } = useLocalSearchParams();
+  const navigation = useNavigation() as NavigationProp;
 
-	const [inputValue, setInputValue] = useState<string>("");
-	const [filteredStores, setFilteredStores] = useState<Store[]>([]);
+  const [inputValue, setInputValue] = useState<string>("");
+  const [filteredStores, setFilteredStores] = useState<Store[]>([]);
 
-	const fetchStores = async (text: string) => {
+  const fetchStores = async (text: string) => {
 		try {
 			setInputValue(text);
 			const res = await api.get("/store/search", { params: { store: text } });
@@ -36,9 +36,9 @@ const Home: React.FC = () => {
 		} catch (error) {
 			console.error("Error while Fetching Stores", error);
 		}
-	};
+  };
 
-	const openStore = async (storeName: string) => {
+  const openStore = async (storeName: string) => {
 		try {
 			await api.get(`/store/${storeName}`);
 			console.log(`Created cart for ${storeName}`);
@@ -47,9 +47,9 @@ const Home: React.FC = () => {
 		} catch (error) {
 			console.error("Error while opening store", error);
 		}
-	};
+  };
 
-	const renderStore = ({ item }: { item: Store }) => (
+  const renderStore = ({ item }: { item: Store }) => (
 		<TouchableOpacity style={homestyles.shopItem} onPress={() => openStore(item.name)}>
 			<Text style={homestyles.shopName}>{item.name} </Text>
 			<Text style={homestyles.shopCategory}>{item.location}</Text>
@@ -59,14 +59,14 @@ const Home: React.FC = () => {
 				<Text style={homestyles.shopCategory}>{item.category}</Text> */}
 			</View>
 		</TouchableOpacity>
-	);
+  );
 
-	return (
+  return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<SafeAreaView style={homestyles.homeContainer}>
 				<View style={homestyles.homeTopBar}>
 					<View>
-						<Text style={homestyles.topBarText}>Username</Text>
+						<Text style={homestyles.topBarText}>{username}</Text>
 					</View>
 					<View style={homestyles.rewardNotifContainer}>
 						<View style={homestyles.getRewardContainer}>
@@ -125,7 +125,7 @@ const Home: React.FC = () => {
 				</View>
 			</SafeAreaView>
 		</GestureHandlerRootView>
-	);
+  );
 };
 
 export default Home;

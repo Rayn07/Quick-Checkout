@@ -18,19 +18,6 @@ interface CartItem {
 
 const storeName = "DMart";
 
-// const Cart: React.FC<{ route: RouteProp<RootStackScreens, "cart"> }> = ({ route }) => {
-// 	const navigation = useNavigation() as NavigationProp;
-
-// 	if (!route?.params) {
-// 		return (
-// 			<SafeAreaView style={homestyles.homeContainer}>
-// 				<View style={cartStyles.topBar}>
-// 					<Text style={homestyles.topBarText}>Error: Missing parameters</Text>
-// 				</View>
-// 			</SafeAreaView>
-// 		);
-// 	}
-
 const Cart: React.FC = () => {
 	const navigation = useNavigation() as NavigationProp;
 

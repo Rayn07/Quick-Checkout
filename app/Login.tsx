@@ -26,6 +26,7 @@ const colors = {
 const Login = () => {
   const navigation = useNavigation() as NavigationProp;
 
+  const [errorMessage, setErrorMessage] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -36,9 +37,12 @@ const Login = () => {
 				password: password,
 			});
 			const username = res.data.userDetails.username;
+			navigation.navigate("(tabs)", { screen: "home", params: { username, email } });
 			console.log("User logged in:", username);
-		} catch (error) {
-			console.error("Error logging in:", error);
+		} catch (error: any) {
+			const errorMsg = error.response.data.message;
+			setErrorMessage(errorMsg);
+			console.error(error.status, "Error logging in:", errorMsg);
 		}
   };
 
@@ -93,16 +97,9 @@ const Login = () => {
 					</TouchableOpacity>
 				</View>
 				<View style={styles.buttonContainer}>
-					<Link
-						style={styles.loginLink}
-						href={{
-							pathname: "/(tabs)/home",
-							params: { email: email },
-						}}
-						onPress={handleLogin}
-					>
+					<TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
 						<Text style={styles.loginButtonText}>Login</Text>
-					</Link>
+					</TouchableOpacity>
 				</View>
 
 				<View style={styles.registerLinkContainer}>
