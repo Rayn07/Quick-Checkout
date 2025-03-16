@@ -4,7 +4,7 @@ import { Fontisto, MaterialIcons } from "@expo/vector-icons";
 import styles from "./Styles/LoginStyles";
 import { Link } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NavigationProp } from "@/types";
 import api from "@/api";
 import {
   View,
@@ -23,13 +23,6 @@ const colors = {
   text: "#000000",
 };
 
-type RootStackScreens = {
-  Login: undefined;
-  "(tabs)": { screen: string };
-};
-
-type NavigationProp = NativeStackNavigationProp<RootStackScreens>;
-
 const Login = () => {
   const navigation = useNavigation() as NavigationProp;
 
@@ -37,90 +30,91 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    try {
-      const res = await api.post("/user/login", {
-        email: email,
-        password: password,
-      });
-      const username = res.data.userDetails.username;
-    } catch (error) {
-      console.error("Error logging in:", error);
-    }
+		try {
+			const res = await api.post("/user/login", {
+				email: email,
+				password: password,
+			});
+			const username = res.data.userDetails.username;
+			console.log("User logged in:", username);
+		} catch (error) {
+			console.error("Error logging in:", error);
+		}
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardContainer}
-      >
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>Welcome Back</Text>
-        </View>
+		<SafeAreaView style={styles.container}>
+			<KeyboardAvoidingView
+				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				style={styles.keyboardContainer}
+			>
+				<View style={styles.headerContainer}>
+					<Text style={styles.headerText}>Welcome Back</Text>
+				</View>
 
-        <View style={styles.inputContainer}>
-          <View style={styles.inputWrapper}>
-            <MaterialIcons
-              name="email"
-              size={20}
-              color={colors.gray}
-              style={styles.icon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              placeholderTextColor={colors.gray}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
+				<View style={styles.inputContainer}>
+					<View style={styles.inputWrapper}>
+						<MaterialIcons
+							name="email"
+							size={20}
+							color={colors.gray}
+							style={styles.icon}
+						/>
+						<TextInput
+							style={styles.input}
+							placeholder="Email"
+							placeholderTextColor={colors.gray}
+							value={email}
+							onChangeText={setEmail}
+							keyboardType="email-address"
+							autoCapitalize="none"
+						/>
+					</View>
 
-          <View style={styles.inputWrapper}>
-            <MaterialIcons
-              name="lock"
-              size={20}
-              color={colors.gray}
-              style={styles.icon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor={colors.gray}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-          </View>
+					<View style={styles.inputWrapper}>
+						<MaterialIcons
+							name="lock"
+							size={20}
+							color={colors.gray}
+							style={styles.icon}
+						/>
+						<TextInput
+							style={styles.input}
+							placeholder="Password"
+							placeholderTextColor={colors.gray}
+							value={password}
+							onChangeText={setPassword}
+							secureTextEntry
+						/>
+					</View>
 
-          <TouchableOpacity style={styles.forgotPasswordContainer}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Link
-              href={{
-                pathname: "/(tabs)/home",
-                params: { email: email },
-              }}
-            >
-              <Text style={styles.loginButtonText}>Login</Text>
-            </Link>
-          </TouchableOpacity>
-        </View>
+					<TouchableOpacity style={styles.forgotPasswordContainer}>
+						<Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+					</TouchableOpacity>
+				</View>
+				<View style={styles.buttonContainer}>
+					<Link
+						style={styles.loginLink}
+						href={{
+							pathname: "/(tabs)/home",
+							params: { email: email },
+						}}
+						onPress={handleLogin}
+					>
+						<Text style={styles.loginButtonText}>Login</Text>
+					</Link>
+				</View>
 
-        <View style={styles.registerLinkContainer}>
-          <Text style={styles.registerText}>Don't have an account? </Text>
-          <TouchableOpacity>
-            <Link href="/Register">
-              <Text style={styles.registerLinkText}>Register</Text>
-            </Link>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+				<View style={styles.registerLinkContainer}>
+					<Text style={styles.registerText}>Don't have an account? </Text>
+					<TouchableOpacity>
+						<Link href="/Register">
+							<Text style={styles.registerLinkText}>Register</Text>
+						</Link>
+					</TouchableOpacity>
+				</View>
+			</KeyboardAvoidingView>
+		</SafeAreaView>
   );
 };
 

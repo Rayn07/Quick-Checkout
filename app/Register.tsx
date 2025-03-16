@@ -12,7 +12,7 @@ import { FontAwesome5, Fontisto, MaterialIcons } from "@expo/vector-icons";
 import styles from "./Styles/LoginStyles";
 import { Link, useNavigation } from "expo-router";
 import api from "@/api";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NavigationProp } from "@/types";
 
 const colors = {
 	primary: "rgb(248,76,76)",
@@ -20,13 +20,6 @@ const colors = {
 	background: "#FFFFFF",
 	text: "#000000",
 };
-
-type RootStackScreens = {
-	Login: undefined;
-	"(tabs)": { screen: string };
-};
-
-type NavigationProp = NativeStackNavigationProp<RootStackScreens>;
 
 const Register = () => {
 	const navigation = useNavigation() as NavigationProp;

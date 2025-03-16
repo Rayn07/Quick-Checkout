@@ -15,8 +15,12 @@ import { FontAwesome5, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import homestyles from "./Styles/HomeStyles";
 import { Link } from "expo-router";
 import productStyles from "./Styles/ProductStyles";
+import { useNavigation } from "@react-navigation/native";
+import { NavigationProp } from "@/types";
+import api from "@/api";
 
 const dmartImage = require("../assets/images/DMART.jpg");
+const storeName = "DMart";
 
 interface Product {
   id: string;
@@ -139,17 +143,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 };
 
 const Store: React.FC = () => {
-  const handleCall = (): void => {
-    Linking.openURL("tel:1234567890");
-  };
+const navigation = useNavigation() as NavigationProp;
 
-  const handleDirections = (): void => {
-    Linking.openURL("https://maps.google.com");
-  };
+	const handleCall = () => {
+		Linking.openURL("tel:1234567890");
+	};
 
-  const handleShare = (): void => {
-    console.log("Share pressed");
-  };
+	const handleDirections = () => {
+		Linking.openURL("https://maps.google.com");
+	};
+
+	const handleShare = () => {
+		console.log("Share pressed");
+	};
 
   const renderProductItem = ({
     item,
@@ -158,6 +164,19 @@ const Store: React.FC = () => {
   }): React.ReactElement => {
     return <ProductCard product={item} />;
   };
+
+  const openCart = async () => {
+		try {
+			const res = await api.get(`/store/${storeName}/cart`);
+			const itemList = res.data.cart.productList;
+
+			console.log("Store Name and Item List:", storeName, itemList);
+			navigation.navigate("cart", { storeName: storeName, itemList: itemList });
+			console.log("Successfully Opened Cart");
+		} catch (error) {
+			console.error("Error while opening cart", error);
+		}
+	};
 
   return (
     <View style={storestyles.container}>
@@ -216,29 +235,41 @@ const Store: React.FC = () => {
           />
         </View>
 
-        <View style={productStyles.bottomPadding} />
+        <View style={productStyles.bottomPadding} />  
       </ScrollView>
 
-      <View style={homestyles.checkoutBar}>
-        <View style={homestyles.checkoutContent}>
-          <View style={homestyles.checkoutButton}>
-            <MaterialIcons name="shopping-cart" size={24} color="white" />
-          </View>
-          <View>
-            <Text style={homestyles.storenameText}>Store Name</Text>
-            <Link href="/cart">
-              <Text style={homestyles.viewcartText}>View Cart</Text>
-            </Link>
-          </View>
-        </View>
-        <View style={homestyles.checkoutButtonContainer}>
-          <Link href="/cart">
-            <Text style={homestyles.checkoutButtonText}>Checkout</Text>
-          </Link>
-        </View>
-      </View>
-    </View>
-  );
+			<View style={storestyles.actionContainer}>
+				<TouchableOpacity style={storestyles.actionButton} onPress={handleDirections}>
+					<FontAwesome5 name="directions" size={30} />
+					<Text style={storestyles.actionText}>Directions</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity style={storestyles.actionButton} onPress={handleCall}>
+					<MaterialIcons name="phone-callback" size={30} />
+					<Text style={storestyles.actionText}>Call</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity style={storestyles.actionButton} onPress={handleShare}>
+					<FontAwesome6 name="share" size={30} />
+					<Text style={storestyles.actionText}>Share</Text>
+				</TouchableOpacity>
+			</View>
+
+			<View style={homestyles.checkoutBar}>
+				<View style={homestyles.checkoutContent}>
+					<View style={homestyles.checkoutButton}>
+						<MaterialIcons name="shopping-cart" size={24} color="white" />
+					</View>
+					<View>
+						<Text style={homestyles.storenameText}>Store Name</Text>
+					</View>
+				</View>
+				<TouchableOpacity style={homestyles.checkoutButtonContainer} onPress={openCart}>
+					<Text style={homestyles.checkoutButtonText}>View Cart</Text>
+				</TouchableOpacity>
+			</View>
+		</View>
+	);
 };
 
 export default Store;

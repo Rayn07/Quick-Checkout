@@ -4,6 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import homestyles from "./Styles/HomeStyles";
 import { cartStyles } from "./Styles/CartStyles";
 import api from "@/api";
+import { NavigationProp, RootStackScreens } from "@/types";
+import { useNavigation } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
 
 interface CartItem {
 	id: string;
@@ -13,39 +16,45 @@ interface CartItem {
 	image: any;
 }
 
-const storeName = "DMart"; // NEED PROP
+const storeName = "DMart";
+
+// const Cart: React.FC<{ route: RouteProp<RootStackScreens, "cart"> }> = ({ route }) => {
+// 	const navigation = useNavigation() as NavigationProp;
+
+// 	if (!route?.params) {
+// 		return (
+// 			<SafeAreaView style={homestyles.homeContainer}>
+// 				<View style={cartStyles.topBar}>
+// 					<Text style={homestyles.topBarText}>Error: Missing parameters</Text>
+// 				</View>
+// 			</SafeAreaView>
+// 		);
+// 	}
 
 const Cart: React.FC = () => {
+	const navigation = useNavigation() as NavigationProp;
+
 	const [cartItems, setCartItems] = useState<CartItem[]>([
 		{
 			id: "1",
-			name: "Coffee",
-			price: 10,
-			quantity: 2,
-			image: require("../assets/images/coffee.jpg"),
-		},
-		{
-			id: "2",
-			name: "Pastry",
+			name: "Milk",
 			price: 20,
 			quantity: 1,
 			image: require("../assets/images/coffee.jpg"),
 		},
-		{
-			id: "3",
-			name: "Sandwich",
-			price: 30,
-			quantity: 1,
-			image: require("../assets/images/coffee.jpg"),
-		},
-		{
-			id: "4",
-			name: "Sandwich",
-			price: 40,
-			quantity: 1,
-			image: require("../assets/images/coffee.jpg"),
-		},
 	]);
+
+	const checkoutCart = async () => {
+		try {
+			const res = await api.get(`/store/${storeName}/cart`);
+			const cartId = res.data.cart._id;
+
+			await api.get(`/payment/send-bill/${cartId}`);
+			console.log("Bill Sent to User's Email");
+		} catch (error) {
+			console.error("Error while Checking Out Cart", error);
+		}
+	};
 
 	const calculateTotal = () => {
 		return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -166,6 +175,7 @@ const Cart: React.FC = () => {
 							alignItems: "center",
 							marginBottom: 20,
 						}}
+						onPress={checkoutCart}
 					>
 						<Text style={{ color: "white", fontWeight: "bold" }}>Checkout</Text>
 					</TouchableOpacity>

@@ -3,8 +3,8 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import profilestyles from "../Styles/ProfileStyles";
 import api from "@/api";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "expo-router";
+import { NavigationProp } from "@/types";
 import {
   AntDesign,
   Feather,
@@ -13,13 +13,6 @@ import {
   MaterialCommunityIcons,
   SimpleLineIcons,
 } from "@expo/vector-icons";
-
-type RootStackScreens = {
-  Login: undefined;
-  "(tabs)": { screen: string };
-};
-
-type NavigationProp = NativeStackNavigationProp<RootStackScreens>;
 
 const profile = () => {
   const navigation = useNavigation() as NavigationProp;

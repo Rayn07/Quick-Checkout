@@ -54,11 +54,11 @@ const styles = StyleSheet.create({
 	buttonContainer: {
 		marginTop: 20,
 	},
-	loginButton: {
+	loginLink: {
 		backgroundColor: colors.primary,
 		padding: 15,
 		borderRadius: 25,
-		alignItems: "center",
+		textAlign: "center",
 	},
 	loginButtonText: {
 		color: colors.background,
