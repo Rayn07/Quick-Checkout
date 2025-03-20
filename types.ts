@@ -10,11 +10,18 @@ type CartRouteParams = {
 		image: any}>;
 }
 
+export type StoreDetails = {
+	_id: string;
+	name: string;
+	location: string;
+	address: string;
+};
+
 export type RootStackScreens = {
 	Login: undefined;
 	Register: undefined;
 	cart: CartRouteParams;
-	store: undefined;
+	store: {};
 	"(tabs)": { screen: string; params: {} };
 };
 

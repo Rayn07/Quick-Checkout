@@ -10,46 +10,50 @@ import {
 } from "react-native-gesture-handler";
 import { Link, useLocalSearchParams } from "expo-router";
 import api from "@/api";
-import { NavigationProp } from "@/types";
+import { NavigationProp, StoreDetails } from "@/types";
 import { useNavigation } from "@react-navigation/native";
 
-interface Store {
-	_id: string;
-	name: string;
-	location: string;
-}
-
 const Home: React.FC = () => {
-  const { username, email } = useLocalSearchParams();
-  const navigation = useNavigation() as NavigationProp;
+	const { username } = useLocalSearchParams();
+	const navigation = useNavigation() as NavigationProp;
 
-  const [inputValue, setInputValue] = useState<string>("");
-  const [filteredStores, setFilteredStores] = useState<Store[]>([]);
+	const [inputValue, setInputValue] = useState<string>("");
+	const [filteredStores, setFilteredStores] = useState<StoreDetails[]>([]);
 
-  const fetchStores = async (text: string) => {
+	const fetchStores = async (text: string) => {
 		try {
 			setInputValue(text);
 			const res = await api.get("/store/search", { params: { store: text } });
-			console.log(res.data.storeDetails);
 			const storeList = res.data.storeDetails;
+
 			setFilteredStores(storeList);
+			console.log("Successfully fetched stores");
 		} catch (error) {
 			console.error("Error while Fetching Stores", error);
 		}
-  };
+	};
 
-  const openStore = async (storeName: string) => {
+	const openStore = async (storeName: string) => {
 		try {
-			await api.get(`/store/${storeName}`);
+			const res = await api.get(`/store/${storeName}`);
+			const storeDetails = res.data.store;
+			const productDetails = res.data.products;
+
 			console.log(`Created cart for ${storeName}`);
 
-			navigation.navigate("store");
+			const storeDetailsString = JSON.stringify(storeDetails);
+			const productDetailsString = JSON.stringify(productDetails);
+
+			navigation.navigate("store", {
+				storeDetails: storeDetailsString,
+				productDetails: productDetailsString,
+			});
 		} catch (error) {
 			console.error("Error while opening store", error);
 		}
-  };
+	};
 
-  const renderStore = ({ item }: { item: Store }) => (
+	const renderStore = ({ item }: { item: StoreDetails }) => (
 		<TouchableOpacity style={homestyles.shopItem} onPress={() => openStore(item.name)}>
 			<Text style={homestyles.shopName}>{item.name} </Text>
 			<Text style={homestyles.shopCategory}>{item.location}</Text>
@@ -59,9 +63,9 @@ const Home: React.FC = () => {
 				<Text style={homestyles.shopCategory}>{item.category}</Text> */}
 			</View>
 		</TouchableOpacity>
-  );
+	);
 
-  return (
+	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<SafeAreaView style={homestyles.homeContainer}>
 				<View style={homestyles.homeTopBar}>
@@ -125,7 +129,7 @@ const Home: React.FC = () => {
 				</View>
 			</SafeAreaView>
 		</GestureHandlerRootView>
-  );
+	);
 };
 
 export default Home;
