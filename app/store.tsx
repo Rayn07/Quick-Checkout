@@ -9,7 +9,7 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import storestyles from "./Styles/StoreStyles";
 import { FontAwesome5, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import homestyles from "./Styles/HomeStyles";
@@ -28,74 +28,40 @@ interface Product {
 	image: ImageSourcePropType;
 }
 
-// Example product data replace with actual product data
-// const productData: Product[] = [
-// 	{
-// 		id: "1",
-// 		name: "Milk",
-// 		price: "₹15",
-// 		image: require("../assets/images/DMART.jpg"),
-// 	},
-// 	{
-// 		id: "2",
-// 		name: "Bread",
-// 		price: "₹20",
-// 		image: require("../assets/images/DMART.jpg"),
-// 	},
-// 	{
-// 		id: "3",
-// 		name: "Eggs",
-// 		price: "₹60",
-// 		image: require("../assets/images/DMART.jpg"),
-// 	},
-// 	{
-// 		id: "4",
-// 		name: "Apples",
-// 		price: "₹50",
-// 		image: require("../assets/images/DMART.jpg"),
-// 	},
-// 	{
-// 		id: "5",
-// 		name: "Chicken",
-// 		price: "₹200",
-// 		image: require("../assets/images/DMART.jpg"),
-// 	},
-// 	{
-// 		id: "6",
-// 		name: "Rice",
-// 		price: "₹100",
-// 		image: require("../assets/images/DMART.jpg"),
-// 	},
-// 	{
-// 		id: "7",
-// 		name: "Bananas",
-// 		price: "₹60",
-// 		image: require("../assets/images/DMART.jpg"),
-// 	},
-// 	{
-// 		id: "8",
-// 		name: "Chips",
-// 		price: "₹10",
-// 		image: require("../assets/images/DMART.jpg"),
-// 	},
-// 	{
-// 		id: "9",
-// 		name: "Water Bottle",
-// 		price: "₹10",
-// 		image: require("../assets/images/DMART.jpg"),
-// 	},
-// ];
-
 interface ProductCardProps {
 	product: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+	const { storeDetails } = useLocalSearchParams();
+	const store = JSON.parse(storeDetails as string);
+	const storeName = store.name;
+
+	const fetchProductQuantity = async () => {
+		try {
+			const res = await api.get(`/store/${storeName}/cart`);
+			const productList = res.data.cart.productList;
+			return productList;
+		} catch (error: any) {
+			const errorMsg = error.response.data.message;
+			console.error(error.status, "Error Fetching Item Quantity:", errorMsg);
+		}
+	};
+
 	const [quantity, setQuantity] = useState<number>(0);
+
+	useEffect(() => {
+		fetchProductQuantity().then((productList) => {
+			const item = productList.find((item: any) => {
+				return item.product === product.id.toString();
+			});
+			setQuantity(item.quantity);
+		});
+	}, []);
 
 	const increaseQuantity = async () => {
 		try {
-			await api.post("/store/:storeName/add-product", {
+			await api.post(`/store/${storeName}/add-product`, {
 				productName: product.name,
 			});
 
@@ -107,9 +73,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 		}
 	};
 
-	const decreaseQuantity = (): void => {
-		if (quantity > 0) {
+	const decreaseQuantity = async () => {
+		try {
+			await api.post(`/store/${storeName}/remove-product`, {
+				productName: product.name,
+			});
+
+			console.log("Product removed from cart:", product.name);
 			setQuantity(quantity - 1);
+		} catch (error: any) {
+			const errorMsg = error.response.data.message;
+			console.error(error.status, "Error Adding Item to Cart:", errorMsg);
 		}
 	};
 
