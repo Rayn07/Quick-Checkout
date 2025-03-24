@@ -9,7 +9,7 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import storestyles from "./Styles/StoreStyles";
 import { FontAwesome5, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import homestyles from "./Styles/HomeStyles";
@@ -18,6 +18,7 @@ import productStyles from "./Styles/ProductStyles";
 import { useNavigation } from "@react-navigation/native";
 import { NavigationProp, StoreDetails } from "@/types";
 import api from "@/api";
+import { ActivityIndicator } from "react-native";
 
 const dmartImage = require("../assets/images/DMART.jpg");
 
@@ -25,6 +26,7 @@ interface Product {
 	id: string;
 	name: string;
 	price: string;
+	quantity: number;
 	image: ImageSourcePropType;
 }
 
@@ -36,31 +38,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 	const { storeDetails } = useLocalSearchParams();
 	const store = JSON.parse(storeDetails as string);
 	const storeName = store.name;
-
-	const fetchProductQuantity = async () => {
-		try {
-			const res = await api.get(`/store/${storeName}/cart`);
-			const productList = res.data.cart.productList;
-			return productList;
-		} catch (error: any) {
-			const errorMsg = error.response.data.message;
-			console.error(error.status, "Error Fetching Item Quantity:", errorMsg);
-		}
-	};
-
 	const [quantity, setQuantity] = useState<number>(0);
-
 	useEffect(() => {
-		fetchProductQuantity().then((productList) => {
-			const item = productList.find((item: any) => {
-				return item.product === product.id.toString();
-			});
-			setQuantity(item.quantity);
-		});
+		console.log("in effect");
+		console.log("product.quant", product);
+		setQuantity(product.quantity);
 	}, []);
-
 	const increaseQuantity = async () => {
 		try {
+			console.log(product.quantity);
+			console.log(quantity);
 			await api.post(`/store/${storeName}/add-product`, {
 				productName: product.name,
 			});
@@ -121,21 +108,56 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 const Store: React.FC = () => {
 	const navigation = useNavigation() as NavigationProp;
 	const { storeDetails, productDetails } = useLocalSearchParams();
+	const [productData, setProductData] = useState<Product[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
 
 	const store = JSON.parse(storeDetails as string);
 	const storeName = store.name;
 	const storeLocation = store.location;
 	const storeAddress = store.address;
 
-	const products = JSON.parse(productDetails as string);
-	const productData: Product[] = products.map((product: any) => {
-		return {
-			id: product._id,
-			name: product.name,
-			price: product.discountPrice,
-			image: require("../assets/images/coffee.jpg"),
+	useEffect(() => {
+		const initializeProducts = async () => {
+			try {
+				const products = JSON.parse(productDetails as string);
+				const initialProductData: Product[] = products.map((product: any) => ({
+					id: product._id,
+					name: product.name,
+					price: product.discountPrice,
+					quantity: 0,
+					image: require("../assets/images/coffee.jpg"),
+				}));
+
+				const productList = await fetchProductQuantity();
+				const updatedProductData = initialProductData.map((product) => {
+					const item = productList?.find((item: any) => item.product === product.id);
+					return {
+						...product,
+						quantity: item ? item.quantity : 0,
+					};
+				});
+
+				setProductData(updatedProductData);
+				setIsLoading(false);
+			} catch (error: any) {
+				const errorMsg = error.response.data.message;
+				console.error(error.status, "Error initializing products:", errorMsg);
+				setIsLoading(false);
+			}
 		};
-	});
+		initializeProducts();
+	}, [productDetails, storeName]);
+
+	const fetchProductQuantity = async () => {
+		try {
+			const res = await api.get(`/store/${storeName}/cart`);
+			const productList = res.data.cart.productList;
+			return productList;
+		} catch (error: any) {
+			const errorMsg = error.response.data.message;
+			console.error(error.status, "Error Fetching Item Quantity:", errorMsg);
+		}
+	};
 
 	const handleCall = () => {
 		Linking.openURL("tel:1234567890");
@@ -149,21 +171,21 @@ const Store: React.FC = () => {
 		console.log("Share pressed");
 	};
 
-	const renderProductItem = ({ item }: { item: Product }): React.ReactElement => {
-		return <ProductCard product={item} />;
-	};
-
 	const openCart = async () => {
 		try {
 			const res = await api.get(`/store/${storeName}/cart`);
 			const itemList = res.data.cart.productList;
 
 			console.log("Store Name and Item List:", storeName, itemList);
-			navigation.navigate("cart", { storeName: storeName, itemList: itemList });
+			navigation.navigate("cart", { storeName, itemList: itemList });
 			console.log("Successfully Opened Cart");
 		} catch (error) {
 			console.error("Error while opening cart", error);
 		}
+	};
+
+	const renderProductItem = ({ item }: { item: Product }): React.ReactElement => {
+		return <ProductCard product={item} />;
 	};
 
 	return (
@@ -198,36 +220,23 @@ const Store: React.FC = () => {
 				<Text style={productStyles.sectionTitle}>Products</Text>
 
 				<View style={productStyles.productsContainer}>
-					<FlatList
-						data={productData}
-						renderItem={renderProductItem}
-						keyExtractor={(item) => item.id}
-						numColumns={3}
-						scrollEnabled={false}
-						columnWrapperStyle={productStyles.row}
-						contentContainerStyle={productStyles.gridContainer}
-					/>
+					{isLoading ? (
+						<ActivityIndicator size="large" color="#0000ff" />
+					) : (
+						<FlatList
+							data={productData}
+							renderItem={renderProductItem}
+							keyExtractor={(item) => item.id}
+							numColumns={3}
+							scrollEnabled={false}
+							columnWrapperStyle={productStyles.row}
+							contentContainerStyle={productStyles.gridContainer}
+						/>
+					)}
 				</View>
 
 				<View style={productStyles.bottomPadding} />
 			</ScrollView>
-
-			<View style={storestyles.actionContainer}>
-				<TouchableOpacity style={storestyles.actionButton} onPress={handleDirections}>
-					<FontAwesome5 name="directions" size={30} />
-					<Text style={storestyles.actionText}>Directions</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity style={storestyles.actionButton} onPress={handleCall}>
-					<MaterialIcons name="phone-callback" size={30} />
-					<Text style={storestyles.actionText}>Call</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity style={storestyles.actionButton} onPress={handleShare}>
-					<FontAwesome6 name="share" size={30} />
-					<Text style={storestyles.actionText}>Share</Text>
-				</TouchableOpacity>
-			</View>
 
 			<View style={homestyles.checkoutBar}>
 				<View style={homestyles.checkoutContent}>
@@ -235,7 +244,7 @@ const Store: React.FC = () => {
 						<MaterialIcons name="shopping-cart" size={24} color="white" />
 					</View>
 					<View>
-						<Text style={homestyles.storenameText}>Store Name</Text>
+						<Text style={homestyles.storenameText}>{storeName}</Text>
 					</View>
 				</View>
 				<TouchableOpacity style={homestyles.checkoutButtonContainer} onPress={openCart}>

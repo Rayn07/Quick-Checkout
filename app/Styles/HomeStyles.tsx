@@ -172,6 +172,7 @@ const homestyles = StyleSheet.create({
 
 	storenameText: {
 		fontWeight: "bold",
+		fontSize: 16,
 	},
 	viewcartText: {
 		fontSize: 12,
