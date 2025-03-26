@@ -1,14 +1,5 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
-type CartRouteParams = {
-		storeName: string;
-		itemList: Array<{
-		id: string,
-		name: string,
-		price: number,
-		quantity: number,
-		image: any}>;
-}
+import { ImageSourcePropType } from "react-native";
 
 export type StoreDetails = {
 	_id: string;
@@ -17,10 +8,18 @@ export type StoreDetails = {
 	address: string;
 };
 
+export interface Product {
+	id: string;
+	name: string;
+	price: number;
+	quantity: number;
+	image: ImageSourcePropType;
+}
+
 export type RootStackScreens = {
 	Login: undefined;
 	Register: undefined;
-	cart: CartRouteParams;
+	cart: {};
 	store: {};
 	"(tabs)": { screen: string; params: {} };
 };

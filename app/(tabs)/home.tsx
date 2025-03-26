@@ -109,6 +109,7 @@ const Home: React.FC = () => {
 						}
 					/>
 				)}
+				{/*DISABLE CART OPENING ON HOME PAGE
 				<View style={homestyles.checkoutBar}>
 					<View style={homestyles.checkoutContent}>
 						<View style={homestyles.checkoutButton}>
@@ -126,7 +127,7 @@ const Home: React.FC = () => {
 							<Text style={homestyles.checkoutButtonText}>Checkout</Text>
 						</Link>
 					</View>
-				</View>
+				</View> */}
 			</SafeAreaView>
 		</GestureHandlerRootView>
 	);

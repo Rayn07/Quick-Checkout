@@ -1,35 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import homestyles from "./Styles/HomeStyles";
 import { cartStyles } from "./Styles/CartStyles";
 import api from "@/api";
-import { NavigationProp, RootStackScreens } from "@/types";
+import { NavigationProp, Product, RootStackScreens } from "@/types";
 import { useNavigation } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
-
-interface CartItem {
-	id: string;
-	name: string;
-	price: number;
-	quantity: number;
-	image: any;
-}
+import { useLocalSearchParams } from "expo-router";
+import productStyles from "./Styles/ProductStyles";
 
 const storeName = "DMart";
 
 const Cart: React.FC = () => {
 	const navigation = useNavigation() as NavigationProp;
 
-	const [cartItems, setCartItems] = useState<CartItem[]>([
-		{
-			id: "1",
-			name: "Milk",
-			price: 20,
-			quantity: 1,
-			image: require("../assets/images/coffee.jpg"),
-		},
-	]);
+	const [cartItems, setCartItems] = useState<Product[]>([]);
+
+	const { storeName, productData } = useLocalSearchParams();
+	const products: Product[] = JSON.parse(productData as string);
+
+	useEffect(() => {
+		const initializeCart = () => {
+			const finalProducts = products.filter((item: any) => item.quantity !== 0);
+			setCartItems(finalProducts);
+		};
+		initializeCart();
+	}, []);
 
 	const checkoutCart = async () => {
 		try {
@@ -51,7 +47,12 @@ const Cart: React.FC = () => {
 		try {
 			if (addOrReduce === "add") {
 				const res = await api.post(`/store/${storeName}/add-product`, { productName });
-				console.log(res.data);
+				// const itemIndex = products.findIndex((item: Product) => item.name === productName);
+				// console.log("PRODUCTS OLD", products);
+				// products[itemIndex].quantity++;
+				// setCartItems(products);
+				// console.log("CART", cartItems);
+				// console.log("PRODUCTS", products); // PRODUCT QUANTITY NEEDS TO BE INCREASED VISUALLY
 			}
 		} catch (error: any) {
 			console.error("Error Increasing Quantity", error);
@@ -67,7 +68,7 @@ const Cart: React.FC = () => {
 		// );
 	};
 
-	const renderCartItem = (item: CartItem) => (
+	const renderCartItem = (item: Product) => (
 		<View key={item.id} style={homestyles.shopItem}>
 			<View style={{ flexDirection: "row", alignItems: "center" }}>
 				<Image
@@ -93,14 +94,14 @@ const Cart: React.FC = () => {
 						<Text>Price: ₹{item.price.toFixed(2)}</Text>
 						<View style={cartStyles.quantityContainer}>
 							<TouchableOpacity
-								onPress={() => updateQuantity(item.id, "add")}
+								onPress={() => updateQuantity(item.name, "add")}
 								style={cartStyles.quantityButton}
 							>
 								<Text style={cartStyles.quantityButtonText}>+</Text>
 							</TouchableOpacity>
 							<Text style={cartStyles.quantityText}>{item.quantity}</Text>
 							<TouchableOpacity
-								onPress={() => updateQuantity(item.id, "add")}
+								onPress={() => updateQuantity(item.name, "add")}
 								style={cartStyles.quantityButton}
 							>
 								<Text style={cartStyles.quantityButtonText}>-</Text>
@@ -123,7 +124,7 @@ const Cart: React.FC = () => {
 					},
 				]}
 			>
-				<Text style={homestyles.topBarText}>Cart</Text>
+				<Text style={homestyles.topBarText}>{storeName} Cart</Text>
 			</View>
 
 			<ScrollView

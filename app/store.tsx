@@ -1,34 +1,16 @@
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Linking,
-  ScrollView,
-  ImageSourcePropType,
-  Dimensions,
-  FlatList,
-} from "react-native";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import { View, Text, Image, TouchableOpacity, Linking, ScrollView, FlatList } from "react-native";
+import React, { useEffect, useState } from "react";
 import storestyles from "./Styles/StoreStyles";
 import { FontAwesome5, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import homestyles from "./Styles/HomeStyles";
-import { Link, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import productStyles from "./Styles/ProductStyles";
 import { useNavigation } from "@react-navigation/native";
-import { NavigationProp, StoreDetails } from "@/types";
+import { NavigationProp, Product } from "@/types";
 import api from "@/api";
 import { ActivityIndicator } from "react-native";
 
 const dmartImage = require("../assets/images/DMART.jpg");
-
-interface Product {
-	id: string;
-	name: string;
-	price: string;
-	quantity: number;
-	image: ImageSourcePropType;
-}
 
 interface ProductCardProps {
 	product: Product;
@@ -38,22 +20,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 	const { storeDetails } = useLocalSearchParams();
 	const store = JSON.parse(storeDetails as string);
 	const storeName = store.name;
+
 	const [quantity, setQuantity] = useState<number>(0);
 	useEffect(() => {
-		console.log("in effect");
-		console.log("product.quant", product);
 		setQuantity(product.quantity);
 	}, []);
+
 	const increaseQuantity = async () => {
 		try {
-			console.log(product.quantity);
-			console.log(quantity);
 			await api.post(`/store/${storeName}/add-product`, {
 				productName: product.name,
 			});
 
 			console.log("Product added to cart:", product.name);
-			setQuantity(quantity + 1);
+			setQuantity((q) => q + 1);
 		} catch (error: any) {
 			const errorMsg = error.response.data.message;
 			console.error(error.status, "Error Adding Item to Cart:", errorMsg);
@@ -67,10 +47,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 			});
 
 			console.log("Product removed from cart:", product.name);
-			setQuantity(quantity - 1);
+			setQuantity((q) => q + 1);
 		} catch (error: any) {
 			const errorMsg = error.response.data.message;
-			console.error(error.status, "Error Adding Item to Cart:", errorMsg);
+			console.error(error.status, "Error Removing Item from Cart:", errorMsg);
 		}
 	};
 
@@ -107,51 +87,56 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
 const Store: React.FC = () => {
 	const navigation = useNavigation() as NavigationProp;
-	const { storeDetails, productDetails } = useLocalSearchParams();
+
 	const [productData, setProductData] = useState<Product[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
+	const { storeDetails, productDetails } = useLocalSearchParams();
 	const store = JSON.parse(storeDetails as string);
 	const storeName = store.name;
 	const storeLocation = store.location;
 	const storeAddress = store.address;
 
 	useEffect(() => {
-		const initializeProducts = async () => {
-			try {
-				const products = JSON.parse(productDetails as string);
-				const initialProductData: Product[] = products.map((product: any) => ({
-					id: product._id,
-					name: product.name,
-					price: product.discountPrice,
-					quantity: 0,
-					image: require("../assets/images/coffee.jpg"),
-				}));
+		updateProducts();
+	}, []);
 
-				const productList = await fetchProductQuantity();
-				const updatedProductData = initialProductData.map((product) => {
-					const item = productList?.find((item: any) => item.product === product.id);
-					return {
-						...product,
-						quantity: item ? item.quantity : 0,
-					};
-				});
+	const updateProducts = async (): Promise<Product[] | undefined> => {
+		try {
+			const products = JSON.parse(productDetails as string);
+			const initialProductData: Product[] = products.map((product: any) => ({
+				id: product._id,
+				name: product.name,
+				price: product.discountPrice,
+				quantity: 0,
+				image: require("../assets/images/coffee.jpg"),
+			}));
 
-				setProductData(updatedProductData);
-				setIsLoading(false);
-			} catch (error: any) {
-				const errorMsg = error.response.data.message;
-				console.error(error.status, "Error initializing products:", errorMsg);
-				setIsLoading(false);
-			}
-		};
-		initializeProducts();
-	}, [productDetails, storeName]);
+			const productList = await fetchProductQuantity();
+			const updatedProductData = initialProductData.map((product) => {
+				const item = productList?.find((item: any) => item.product === product.id);
+				return {
+					...product,
+					quantity: item ? item.quantity : 0,
+				};
+			});
+
+			setProductData(updatedProductData);
+			setIsLoading(false);
+
+			return updatedProductData;
+		} catch (error: any) {
+			const errorMsg = error.response.data.message;
+			console.error(error.status, "Error initializing products:", errorMsg);
+			setIsLoading(false);
+		}
+	};
 
 	const fetchProductQuantity = async () => {
 		try {
 			const res = await api.get(`/store/${storeName}/cart`);
 			const productList = res.data.cart.productList;
+
 			return productList;
 		} catch (error: any) {
 			const errorMsg = error.response.data.message;
@@ -159,29 +144,32 @@ const Store: React.FC = () => {
 		}
 	};
 
-	const handleCall = () => {
+	const openCart = async () => {
+		try {
+			await api.get(`/store/${storeName}/cart`); //Initialize Cart Value
+
+			const latestProductData = (await updateProducts()) as Product[];
+			const productDataString = JSON.stringify(latestProductData);
+
+			navigation.navigate("cart", { storeName, productData: productDataString });
+
+			console.log("Successfully Opened Cart");
+		} catch (error: any) {
+			const errorMsg = error.response.data.message;
+			console.error(error.status, "Error while opening cart:", errorMsg);
+		}
+	};
+
+	const handleCall = (): void => {
 		Linking.openURL("tel:1234567890");
 	};
 
-	const handleDirections = () => {
+	const handleDirections = (): void => {
 		Linking.openURL("https://maps.google.com");
 	};
 
 	const handleShare = () => {
 		console.log("Share pressed");
-	};
-
-	const openCart = async () => {
-		try {
-			const res = await api.get(`/store/${storeName}/cart`);
-			const itemList = res.data.cart.productList;
-
-			console.log("Store Name and Item List:", storeName, itemList);
-			navigation.navigate("cart", { storeName, itemList: itemList });
-			console.log("Successfully Opened Cart");
-		} catch (error) {
-			console.error("Error while opening cart", error);
-		}
 	};
 
 	const renderProductItem = ({ item }: { item: Product }): React.ReactElement => {
