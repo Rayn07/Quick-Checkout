@@ -4,12 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import homestyles from "./Styles/HomeStyles";
 import { cartStyles } from "./Styles/CartStyles";
 import api from "@/api";
-import { NavigationProp, Product, RootStackScreens } from "@/types";
+import { NavigationProp, Product } from "@/types";
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
-import productStyles from "./Styles/ProductStyles";
-
-const storeName = "DMart";
 
 const Cart: React.FC = () => {
 	const navigation = useNavigation() as NavigationProp;
@@ -21,7 +18,7 @@ const Cart: React.FC = () => {
 
 	useEffect(() => {
 		const initializeCart = () => {
-			const finalProducts = products.filter((item: any) => item.quantity !== 0);
+			const finalProducts = products.filter((item: Product) => item.quantity !== 0);
 			setCartItems(finalProducts);
 		};
 		initializeCart();
@@ -30,12 +27,15 @@ const Cart: React.FC = () => {
 	const checkoutCart = async () => {
 		try {
 			const res = await api.get(`/store/${storeName}/cart`);
-			const cartId = res.data.cart._id;
+			const cartId: string = res.data.cart._id;
 
 			await api.get(`/payment/send-bill/${cartId}`);
+			navigation.navigate("(tabs)", { screen: "home", params: {} });
+
 			console.log("Bill Sent to User's Email");
-		} catch (error) {
-			console.error("Error while Checking Out Cart", error);
+		} catch (error: any) {
+			const errorMsg = error.response.data.message;
+			console.error(error.status, "Error While Checking Out Cart:", errorMsg);
 		}
 	};
 
@@ -43,29 +43,42 @@ const Cart: React.FC = () => {
 		return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 	};
 
-	const updateQuantity = async (productName: string, addOrReduce: string) => {
+	const increaseQuantity = async (productName: string) => {
 		try {
-			if (addOrReduce === "add") {
-				const res = await api.post(`/store/${storeName}/add-product`, { productName });
-				// const itemIndex = products.findIndex((item: Product) => item.name === productName);
-				// console.log("PRODUCTS OLD", products);
-				// products[itemIndex].quantity++;
-				// setCartItems(products);
-				// console.log("CART", cartItems);
-				// console.log("PRODUCTS", products); // PRODUCT QUANTITY NEEDS TO BE INCREASED VISUALLY
-			}
+			await api.post(`/store/${storeName}/add-product`, { productName });
+
+			const updatedCartItems = cartItems.map((item: Product) => {
+				if (item.name === productName) {
+					return { ...item, quantity: item.quantity + 1 };
+				} else return item;
+			});
+
+			console.log("Product Quantity Increased:", productName);
+			setCartItems(updatedCartItems);
 		} catch (error: any) {
-			console.error("Error Increasing Quantity", error);
+			const errorMsg = error.response.data.message;
+			console.error(error.status, "Error Increasing Product Quantity:", errorMsg);
 		}
-		// setCartItems((currentItems) =>
-		// 	currentItems
-		// 		.map((item) =>
-		// 			item.id === id
-		// 				? { ...item, quantity: Math.max(0, item.quantity + change) }
-		// 				: item
-		// 		)
-		// 		.filter((item) => item.quantity > 0)
-		// );
+	};
+
+	const reduceQuantity = async (productName: string) => {
+		try {
+			await api.post(`/store/${storeName}/remove-product`, { productName });
+
+			const updatedCartItems = cartItems
+				.map((item: Product) => {
+					if (item.name === productName) {
+						return { ...item, quantity: item.quantity - 1 };
+					} else return item;
+				})
+				.filter((item: Product) => item.quantity !== 0);
+
+			console.log("Product Quantity Reduced:", productName);
+			setCartItems(updatedCartItems);
+		} catch (error: any) {
+			const errorMsg = error.response.data.message;
+			console.error(error.status, "Error Reducing Product Quantity:", errorMsg);
+		}
 	};
 
 	const renderCartItem = (item: Product) => (
@@ -94,14 +107,14 @@ const Cart: React.FC = () => {
 						<Text>Price: ₹{item.price.toFixed(2)}</Text>
 						<View style={cartStyles.quantityContainer}>
 							<TouchableOpacity
-								onPress={() => updateQuantity(item.name, "add")}
+								onPress={() => increaseQuantity(item.name)}
 								style={cartStyles.quantityButton}
 							>
 								<Text style={cartStyles.quantityButtonText}>+</Text>
 							</TouchableOpacity>
 							<Text style={cartStyles.quantityText}>{item.quantity}</Text>
 							<TouchableOpacity
-								onPress={() => updateQuantity(item.name, "add")}
+								onPress={() => reduceQuantity(item.name)}
 								style={cartStyles.quantityButton}
 							>
 								<Text style={cartStyles.quantityButtonText}>-</Text>

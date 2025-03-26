@@ -47,7 +47,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 			});
 
 			console.log("Product removed from cart:", product.name);
-			setQuantity((q) => q + 1);
+			setQuantity((q) => q - 1);
 		} catch (error: any) {
 			const errorMsg = error.response.data.message;
 			console.error(error.status, "Error Removing Item from Cart:", errorMsg);
@@ -127,7 +127,7 @@ const Store: React.FC = () => {
 			return updatedProductData;
 		} catch (error: any) {
 			const errorMsg = error.response.data.message;
-			console.error(error.status, "Error initializing products:", errorMsg);
+			console.error(error.status, "Error Initializing Products:", errorMsg);
 			setIsLoading(false);
 		}
 	};
@@ -156,7 +156,7 @@ const Store: React.FC = () => {
 			console.log("Successfully Opened Cart");
 		} catch (error: any) {
 			const errorMsg = error.response.data.message;
-			console.error(error.status, "Error while opening cart:", errorMsg);
+			console.error(error.status, "Error Opening Cart:", errorMsg);
 		}
 	};
 
