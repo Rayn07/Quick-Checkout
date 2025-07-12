@@ -169,6 +169,7 @@ const Store: React.FC = () => {
 	};
 
 	const handleShare = () => {
+		Linking.openURL("upi://pay?pa=emmyp123@ybl&pn=RaynTariq&am=99.99&cu=INR");
 		console.log("Share pressed");
 	};
 

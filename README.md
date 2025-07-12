@@ -1,1 +1,1 @@
-Modify api.ts with ipv4 address to run expo go
+Modify the `.env` file with ipv4 address and run `npx expo start`
