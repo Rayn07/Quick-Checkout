@@ -47,7 +47,14 @@ storeRouter.get(
 	"image": string,
 	"address": string,
 	"location": string,
-} */
+},
+"products":
+[{
+	"discountPrice": number,
+	"mrp": number,
+	"name": string,
+	"store": string<store_id>,
+}] */
 
 storeRouter.post(
 	"/store/:storeName/add-product",

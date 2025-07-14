@@ -24,7 +24,7 @@ app.use(cookieParser());
 //cors
 app.use(
 	cors({
-		origin: process.env.ORIGIN,
+		origin: "http://localhost:8081",
 	})
 );
 
