@@ -78,15 +78,15 @@ export const saveStore = CatchAsyncError(
 		try {
 			const storeName = req.params.storeName;
 			const store = await storeModel.findOne({ name: storeName });
-			const username = req.headers.username;
-			const user = await userModel.findOne({ name: username });
+			// const username = req.headers.username;
+			// const user = await userModel.findOne({ name: username });
 
 			if (!store) {
 				return next(new ErrorHandler("Store not found", 404));
 			}
-			if (!user) {
-				return next(new ErrorHandler("User not found", 404));
-			}
+			// if (!user) {
+			// 	return next(new ErrorHandler("User not found", 405));
+			// }
 
 			res.locals.store = store;
 
@@ -103,6 +103,9 @@ export const getStoreDetails = CatchAsyncError(
 			const user = req.user;
 			const store = res.locals.store;
 
+			const products = await productModel.find({ store: store._id });
+
+			// Create cart for store if not exists
 			let cart = await cartModel.findOne({
 				user: user?._id,
 				store: store._id,
@@ -115,14 +118,12 @@ export const getStoreDetails = CatchAsyncError(
 				}).save();
 			}
 
-			await userModel.findOneAndUpdate(
-				{ name: req.headers.username },
-				{ cart: cart._id }
-			);
+			await userModel.findOneAndUpdate({ name: req.headers.username }, { cart: cart._id });
 
 			res.status(200).json({
 				status: true,
 				store,
+				products,
 			});
 		} catch (error: any) {
 			return next(new ErrorHandler(error.message, 500));
@@ -159,13 +160,11 @@ export const addProduct = CatchAsyncError(
 					res.json({
 						status: true,
 						message: "Product added to cart",
+						cart: cart.productList,
 					});
 				} else {
 					return next(
-						new ErrorHandler(
-							`Failed to add product to cart. ${result.message}`,
-							500
-						)
+						new ErrorHandler(`Failed to add product to cart. ${result.message}`, 500)
 					);
 				}
 			});

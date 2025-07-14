@@ -22,7 +22,7 @@ paymentRouter.get("/payment/amount/:cartId", isAuthenticated, getPaymentAmount);
 	"totalAmount": number,
 } */
 
-// For testing
+// FOR TESTING
 paymentRouter.get(
 	"/payment/generate-bill/:cartId",
 	isAuthenticated,
